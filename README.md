@@ -1,2 +1,2 @@
 # reader-api
-reader api server
+reader api service
