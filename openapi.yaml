@@ -23,75 +23,26 @@ consumes:
 produces:
   - "application/json"
 paths:
-  /auth/signup:
-    post:
-      tags:
-      - "auth"
-      summary: "Sign up new account for user"
-      description: ""
-      operationId: "signup"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-      - name: "email"
-        in: "formData"
-        description: "The email for login"
-        required: true
-        type: "string"
-      - name: "username"
-        in: "formData"
-        description: "The user name for login"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid email"
-  /auth/login:
-    post:
-      tags:
-      - "auth"
-      summary: "Logs user into the system by email"
-      description: ""
-      operationId: "loginByEmail"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-      - in: "formData"
-        name: "email"
-        description: "The email for login"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation, send a token to email"
-        400:
-          description: "Invalid email"        
-  /auth/verify:
+  /auth/facebook:
     get:
       tags:
       - "auth"
-      summary: "Logs out current logged in user session"
+      summary: "Logs user into the system by facebook"
       description: ""
-      operationId: "verify"
-      produces:
-      - "application/json"
-      parameters:
-      - name: "token"
-        in: "query"
-        description: "Token of user for login"
-        required: true
-        type: "string"
+      operationId: ""
+      responses:
+        200:
+          description: "successful operation, send a facebook login form"
+  /auth/facebook/callback:
+    get:
+      tags:
+      - "auth"
+      summary: "Facebook call this api to return result of authentication"
+      description: ""
+      operationId: ""
       responses:
         200:
           description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid token"    
   /auth/logout:
     get:
       tags:
@@ -99,28 +50,26 @@ paths:
       summary: "Logs out current logged in user session"
       description: ""
       operationId: "logout"
-      produces:
-      - "application/json"
       parameters: []
       responses:
         default:
           description: "successful operation"
-  /user:
+  /user/subscriptions:
     get:
       tags:
       - "user"
-      summary: "Returns all users available in the database"
+      summary: "Returns all sources of user available in the database"
       description: ""
-      operationId: "allUser"
+      operationId: "getUserSource"
       parameters:
       - name: "sort"
         in: "query"
-        description: "Sort the list of users by property"
+        description: "Sort the list of sources by property"
         required: false
         type: "string"
       - name: "limit"
         in: "query"
-        description: "Limit number of users return from server"
+        description: "Limit number of sources return from server"
         required: false
         type: "string"
       - name: "page"
@@ -133,9 +82,45 @@ paths:
         description: "Keywords to search"
         required: false
         type: "string"
-      - name: "filter"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+      security:
+      - UserSecurity: []
+  /user/saved:
+    get:
+      tags:
+      - "user"
+      summary: "Returns all saved post of user available in the database"
+      description: ""
+      operationId: "getUserSavedPost"
+      parameters:
+      - name: "sort"
         in: "query"
-        description: "Conditions to get user list"
+        description: "Sort the list of posts by property"
+        required: false
+        type: "string"
+        enum:
+          - "new"
+          - "best"
+          - "daily"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of posts return from server"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "string"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
         required: false
         type: "string"
       responses:
@@ -144,140 +129,13 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/User"
+              $ref: "#/definitions/Post"
       security:
-      - AdminSecurity: []
-    post:
-      tags:
-      - "user"
-      summary: "Create new user"
-      description: ""
-      operationId: "createUser"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-      - name: "email"
-        in: "formData"
-        description: "The email of user"
-        required: true
-        type: "string"
-      - name: "username"
-        in: "formData"
-        description: "The user name of user"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid email"
-      security:
-      - AdminSecurity: []
-  /user/count:
+      - UserSecurity: []
+  /sources:
     get:
       tags:
-      - "user"
-      summary: "Count all users available in the database"
-      description: ""
-      operationId: "countUser"
-      parameters:
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get user list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/CountObjs"
-      security:
-      - AdminSecurity: []
-  /user/{id}:
-    get:
-      tags:
-      - "user"
-      summary: "Retrieve a single user by id"
-      description: ""
-      operationId: "getUser"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "ID of the user to get"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        404:
-          description: "User not found"
-      security:
-      - AdminSecurity: []
-    put:
-      tags:
-      - "user"
-      summary: "Update user by id"
-      description: ""
-      operationId: "updateUser"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "id of the source to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "email"
-        in: "formData"
-        description: "The email of user"
-        required: true
-        type: "string"
-      - name: "username"
-        in: "formData"
-        description: "The user name of user"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/User"
-        400:
-          description: "Invalid email"
-      security:
-      - AdminSecurity: []
-    delete:
-      tags: 
-      - "user"
-      description: "Delete a user by id"
-      operationId: "deleteUser"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "id of the user to delete"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "user deleted"    
-      security:
-      - AdminSecurity: []
-  /source:
-    get:
-      tags:
-      - "source"
+      - "sources"
       summary: "Returns all sources available in the database"
       description: ""
       operationId: "allSource"
@@ -302,11 +160,6 @@ paths:
         description: "Keywords to search"
         required: false
         type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get source list"
-        required: false
-        type: "string"
       responses:
         200:
           description: "successful operation"
@@ -314,150 +167,19 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Source"
-      security:
-      - UserSecurity: []
-    post:
-      tags:
-      - "source"
-      summary: "Create new source"
-      description: ""
-      operationId: "createSource"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-      - name: "title"
-        in: "formData"
-        description: "The title of source"
-        required: true
-        type: "string"
-      - name: "url"
-        in: "formData"
-        description: "The url of source"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Source"
-        400:
-          description: "Invalid title"
-      security:
-      - AdminSecurity: []
-  /source/count:
-    get:
-      tags:
-      - "source"
-      summary: "Count all sources available in the database"
-      description: ""
-      operationId: "countSource"
-      parameters:
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get source list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/CountObjs"
-      security:
-      - AdminSecurity: []
-  /source/{id}:
-    get:
-      tags:
-      - "source"
-      summary: "Retrieve a single source by id"
-      description: ""
-      operationId: "getSource"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "ID of the source to get"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Source"
-        404:
-          description: "Source not found"
-      security:
-      - UserSecurity: []
-      - AdminSecurity: []
+  /sources/{id}/subscriptions:
     put:
       tags:
-      - "source"
-      summary: "Update source by id"
-      description: ""
-      operationId: "updateSource"
-      consumes:
-      - "application/x-www-form-urlencoded"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "Id of the source to update"
-        required: true
-        type: "integer"
-        format: "int64"
-      - name: "title"
-        in: "formData"
-        description: "The title of source"
-        required: true
-        type: "string"
-      - name: "url"
-        in: "formData"
-        description: "The url of source"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Source"
-        400:
-          description: "Invalid title"
-      security:
-      - AdminSecurity: []
-    delete:
-      tags: 
-      - "source"
-      description: "Delete a source by id"
-      operationId: "deleteSource"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "id of the source to delete"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "source deleted"    
-      security:
-      - AdminSecurity: []
-  /source/{id}/subscribe:
-    get:
-      tags:
-      - "source"
-      summary: "Subscribe source by id"
+      - "sources"
+      summary: "Subscribe a source"
       description: ""
       operationId: "subscribeSource"
       parameters:
       - name: "id"
         in: "path"
-        description: "ID of the source to get"
+        description: "Source id to subscibe"
         required: true
-        type: "integer"
-        format: "int64"
+        type: "string"
       responses:
         200:
           description: "successful operation"
@@ -467,33 +189,29 @@ paths:
           description: "Source not found"
       security:
       - UserSecurity: []
-  /source/{id}/unsubscribe:
-    get:
+    delete:
       tags:
-      - "source"
-      summary: "Unsubscribe source by id"
+      - "sources"
+      summary: "Unsubscribe a source"
       description: ""
-      operationId: "unsubscribeSource"
+      operationId: "unSubscribe"
       parameters:
       - name: "id"
         in: "path"
-        description: "ID of the source to get"
+        description: "id of the source to delete"
         required: true
-        type: "integer"
-        format: "int64"
+        type: "string"
       responses:
         200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Source"
+          description: "Source unsubscribed"
         404:
           description: "Source not found"
       security:
       - UserSecurity: []
-  /post:
+  /posts:
     get:
       tags:
-      - "post"
+      - "posts"
       summary: "Returns all posts available in the database"
       description: ""
       operationId: "allPost"
@@ -503,6 +221,10 @@ paths:
         description: "Sort the list of posts by property"
         required: false
         type: "string"
+        enum:
+          - "new"
+          - "best"
+          - "daily"
       - name: "limit"
         in: "query"
         description: "Limit number of posts return from server"
@@ -518,11 +240,6 @@ paths:
         description: "Keywords to search"
         required: false
         type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get post list"
-        required: false
-        type: "string"
       responses:
         200:
           description: "successful operation"
@@ -530,181 +247,28 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Post"
-      security:
-      - UserSecurity: []
-  /post/count:
-    get:
+  /posts/{id}/{action}:
+    put:
       tags:
-      - "post"
-      summary: "Count all posts available in the database"
+      - "posts"
+      summary: "Action for post"
       description: ""
-      operationId: "countPost"
-      parameters:
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get post list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/CountObjs"
-      security:
-      - UserSecurity: []
-  /post/saved:
-    get:
-      tags:
-      - "post"
-      summary: "Returns all saved posts available in the database"
-      description: ""
-      operationId: "allSavedPost"
-      parameters:
-      - name: "sort"
-        in: "query"
-        description: "Sort the list of saved posts by property"
-        required: false
-        type: "string"
-      - name: "limit"
-        in: "query"
-        description: "Limit number of saved posts return from server"
-        required: false
-        type: "string"
-      - name: "page"
-        in: "query"
-        description: "How many rows to skip"
-        required: false
-        type: "string"
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get saved post list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Post"
-      security:
-      - UserSecurity: []
-  /post/saved/count:
-    get:
-      tags:
-      - "post"
-      summary: "Count all saved posts available in the database"
-      description: ""
-      operationId: "countSavedPost"
-      parameters:
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get saved post list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/CountObjs"
-      security:
-      - UserSecurity: []
-  /post/viewed:
-    get:
-      tags:
-      - "post"
-      summary: "Returns all viewed posts available in the database"
-      description: ""
-      operationId: "allViewedPost"
-      parameters:
-      - name: "sort"
-        in: "query"
-        description: "Sort the list of viewed posts by property"
-        required: false
-        type: "string"
-      - name: "limit"
-        in: "query"
-        description: "Limit number of viewed posts return from server"
-        required: false
-        type: "string"
-      - name: "page"
-        in: "query"
-        description: "How many rows to skip"
-        required: false
-        type: "string"
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get viewed post list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/Post"
-      security:
-      - UserSecurity: []
-  /post/viewed/count:
-    get:
-      tags:
-      - "post"
-      summary: "Count all viewed posts available in the database"
-      description: ""
-      operationId: "countVieweddPost"
-      parameters:
-      - name: "query"
-        in: "query"
-        description: "Keywords to search"
-        required: false
-        type: "string"
-      - name: "filter"
-        in: "query"
-        description: "Conditions to get viewed post list"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/CountObjs"
-      security:
-      - UserSecurity: []
-  /post/{id}:
-    get:
-      tags:
-      - "post"
-      summary: "Retrieve a single post by id"
-      description: ""
-      operationId: "getPost"
+      operationId: "actionPost"
       parameters:
       - name: "id"
         in: "path"
-        description: "ID of the post to get"
+        description: "Post id to view/save/share"
         required: true
-        type: "integer"
-        format: "int64"
+        type: "string"
+      - name: "action"
+        in: "path"
+        description: "Post id to view/save/share"
+        required: true
+        type: "string"
+        enum:
+          - "new"
+          - "best"
+          - "daily"
       responses:
         200:
           description: "successful operation"
@@ -714,95 +278,81 @@ paths:
           description: "Post not found"
       security:
       - UserSecurity: []
-  /post/{id}/share:
-    get:
-      tags:
-      - "post"
-      summary: "Share a post by id"
-      description: ""
-      operationId: "sharePost"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "ID of the post to get"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Post"
-        404:
-          description: "Post not found"
-      security:
-      - UserSecurity: []
-  /post/{id}/save:
-    get:
-      tags:
-      - "post"
-      summary: "Save a post by id"
-      description: ""
-      operationId: "savePost"
-      parameters:
-      - name: "id"
-        in: "path"
-        description: "ID of the post to get"
-        required: true
-        type: "integer"
-        format: "int64"
-      responses:
-        200:
-          description: "successful operation"
-          schema:
-            $ref: "#/definitions/Post"
-        404:
-          description: "Post not found"
-      security:
-      - UserSecurity: []
+
 securityDefinitions:
   UserSecurity:
     type: basic
-  AdminSecurity:
-    type: basic
-    
+
 definitions:
   User:
     type: "object"
     required:
-    - "username"
     - "email"
     properties:
       id:
         type: "string"
         description: "Id for the user"
-      username:
-        type: "string"
-        description: "Username for the user"
       email:
         type: "string"
         description: "Email for the user"
       token:
         type: "string"
         description: "Token for the user when login by email"
-      type:
+      vendor:
         type: "string"
-        description: "Type for the user"
-        enum: 
-          - "admin"
-          - "user"
+        description: "Vendro for the auth"
       sources:
         type: "array"
         items:
           type: "string"
           description: "Reference to source model"
-  Source: 
+      profile:
+        type: "object"
+        properties:
+          id:
+            type: "string"
+            description: "Facebook id"
+          username:
+            type: "string"
+            description: "Facebook username"
+          displayName:
+            type: "string"
+            description: "Facebook display name"
+          name:
+            type: "object"
+            properties:
+              familyName:
+                type: "string"
+                description: "Facebook first name"
+              giveName:
+                type: "string"
+                description: "Facebook last name"
+              middleName:
+                type: "string"
+                description: "Facebook middle name"
+          gender:
+            type: "string"
+            description: "Facebook gender"
+          profileUrl:
+            type: "string"
+            description: "Facebook profile url"
+          emails:
+            type: "array"
+            description: "Facebook email list"
+            items:
+              type: "string"
+          photos:
+            type: "array"
+            description: "Facebook photo list"
+            items:
+              type: "string"
+  Source:
     type: "object"
     required:
     - "title"
     - "url"
     properties:
-      id: 
+      id:
         type: "string"
         description: "Id for the source"
       title:
@@ -816,8 +366,8 @@ definitions:
     required:
       - "title"
       - "url"
-    properties: 
-      id: 
+    properties:
+      id:
         type: "string"
         description: "Id for the post"
       title:
@@ -852,19 +402,3 @@ definitions:
             type: "integer"
             format: "int64"
             description: "Count number of saves in the post"
-  CountObjs:
-    type: "object"
-    properties:
-      num:
-        type: "integer"
-        format: "int64"
-  ApiResponse:
-      type: "object"
-      properties:
-        code:
-          type: "integer"
-          format: "int32"
-        type:
-          type: "string"
-        message:
-          type: "string"
