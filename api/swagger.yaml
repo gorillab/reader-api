@@ -1,0 +1,489 @@
+---
+swagger: "2.0"
+info:
+  description: "This api service served to end users or third-party apps/services"
+  version: "1.0.0"
+  title: "Reader API"
+  contact:
+    name: "Gorillab"
+    url: "https://gorillab.co/"
+    email: "hello@gorillab.co"
+host: "localhost:3000"
+basePath: "/api/v1"
+tags:
+- name: "auth"
+  description: "Auth module"
+- name: "user"
+  description: "User module"
+- name: "source"
+  description: "Source module"
+- name: "post"
+  description: "Post module"
+schemes:
+- "http"
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /auth/facebook:
+    get:
+      tags:
+      - "auth"
+      summary: "Logs user into the system by facebook"
+      operationId: "loginByFacebook"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation, send a facebook login form"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      x-swagger-router-controller: "Auth"
+  /auth/facebook/callback:
+    get:
+      tags:
+      - "auth"
+      summary: "Facebook call this api to return result of authentication"
+      operationId: "loginByFacebookCallback"
+      parameters: []
+      responses:
+        301:
+          description: "the server redirect user to homepage"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      x-swagger-router-controller: "Auth"
+  /auth/logout:
+    post:
+      tags:
+      - "auth"
+      summary: "Logs out current logged in user session"
+      operationId: "logout"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      x-swagger-router-controller: "Auth"
+  /user/subscriptions:
+    get:
+      tags:
+      - "user"
+      summary: "Returns all sources of user available in the database"
+      operationId: "getUserSource"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of sources by property"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of sources return from server"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "string"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "User"
+  /user/saved:
+    get:
+      tags:
+      - "user"
+      summary: "Returns all saved post of user available in the database"
+      operationId: "getUserSavedPost"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of posts by property"
+        required: false
+        type: "string"
+        enum:
+        - "new"
+        - "best"
+        - "daily"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of posts return from server"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "string"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "User"
+  /sources:
+    get:
+      tags:
+      - "source"
+      summary: "Returns all sources available in the database"
+      operationId: "allSource"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of sources by property"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of sources return from server"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "string"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      x-swagger-router-controller: "Source"
+  /sources/{id}/subscriptions:
+    put:
+      tags:
+      - "source"
+      summary: "Subscribe a source"
+      operationId: "subscribeSource"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Source id to subscibe"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Source"
+    delete:
+      tags:
+      - "source"
+      summary: "Unsubscribe a source"
+      operationId: "unSubscribe"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the source to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Source unsubscribed"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Source"
+  /posts:
+    get:
+      tags:
+      - "post"
+      summary: "Returns all posts available in the database"
+      operationId: "allPost"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of posts by property"
+        required: false
+        type: "string"
+        enum:
+        - "new"
+        - "best"
+        - "daily"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of posts return from server"
+        required: false
+        type: "string"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "string"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      x-swagger-router-controller: "Post"
+  /posts/{id}/{action}:
+    put:
+      tags:
+      - "post"
+      summary: "Actions for the post"
+      operationId: "actionPost"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Post id to view/save/share"
+        required: true
+        type: "string"
+      - name: "action"
+        in: "path"
+        description: "Post id to view/save/share"
+        required: true
+        type: "string"
+        enum:
+        - "save"
+        - "share"
+        - "view"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Post"
+    delete:
+      tags:
+      - "post"
+      summary: "Remove action for the post"
+      operationId: "RemoveActionPost"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+      - name: "action"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+        enum:
+        - "save"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Post"
+securityDefinitions:
+  UserSecurity:
+    type: "basic"
+definitions:
+  User:
+    type: "object"
+    required:
+    - "email"
+    properties:
+      id:
+        type: "string"
+        description: "Id for the user"
+      email:
+        type: "string"
+        description: "Email for the user"
+      token:
+        type: "string"
+        description: "Token for the user when login by email"
+      vendor:
+        type: "string"
+        description: "Vendro for the auth"
+      sources:
+        type: "array"
+        items:
+          type: "string"
+          description: "Reference to source model"
+      profile:
+        $ref: "#/definitions/User_profile"
+  Source:
+    type: "object"
+    required:
+    - "title"
+    - "url"
+    properties:
+      id:
+        type: "string"
+        description: "Id for the source"
+      title:
+        type: "string"
+        description: "Title for the source"
+      url:
+        type: "string"
+        description: "Url for the source"
+  Post:
+    type: "object"
+    required:
+    - "title"
+    - "url"
+    properties:
+      id:
+        type: "string"
+        description: "Id for the post"
+      title:
+        type: "string"
+        description: "Title for the post"
+      content:
+        type: "string"
+        description: "Content for the post"
+      image:
+        type: "string"
+        description: "Image path for the post"
+      url:
+        type: "string"
+        description: "Url for the post"
+      source:
+        type: "string"
+        format: "objectId"
+        description: "Reference to Source model"
+      meta:
+        $ref: "#/definitions/Post_meta"
+  ApiErrorResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+  inline_response_200:
+    properties:
+      message:
+        type: "string"
+  User_profile_name:
+    properties:
+      familyName:
+        type: "string"
+        description: "Facebook first name"
+      giveName:
+        type: "string"
+        description: "Facebook last name"
+      middleName:
+        type: "string"
+        description: "Facebook middle name"
+  User_profile:
+    properties:
+      id:
+        type: "string"
+        description: "Facebook id"
+      username:
+        type: "string"
+        description: "Facebook username"
+      displayName:
+        type: "string"
+        description: "Facebook display name"
+      name:
+        $ref: "#/definitions/User_profile_name"
+      gender:
+        type: "string"
+        description: "Facebook gender"
+      profileUrl:
+        type: "string"
+        description: "Facebook profile url"
+      emails:
+        type: "array"
+        description: "Facebook email list"
+        items:
+          type: "string"
+      photos:
+        type: "array"
+        description: "Facebook photo list"
+        items:
+          type: "string"
+  Post_meta:
+    properties:
+      numViewed:
+        type: "integer"
+        format: "int64"
+        description: "Count number of views in the post"
+      numShared:
+        type: "integer"
+        format: "int64"
+        description: "Count number of shares in the post"
+      numSaved:
+        type: "integer"
+        format: "int64"
+        description: "Count number of saves in the post"
+    description: "Meta of the post"
