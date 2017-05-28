@@ -1,12 +1,21 @@
 swagger: "2.0"
 info:
-  description: "reader api service"
-  version: "0.0.1"
   title: "Reader API"
+  description: "This api service served to end users or third-party apps/services"
+  version: "1.0.0"
   contact:
+    name: "Gorillab"
+    url: "https://gorillab.co/"
     email: "hello@gorillab.co"
-host: "glab-reader-api.herokuapp.com"
-basePath: "/api"
+host: "localhost:3000"
+basePath: "/api/v1"
+schemes:
+- "http"
+- "https"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
 tags:
 - name: "auth"
   description: "Auth module"
@@ -16,50 +25,57 @@ tags:
   description: "Source module"
 - name: "post"
   description: "Post module"
-schemes:
-- "http"
-consumes:
-  - "application/json"
-produces:
-  - "application/json"
 paths:
   /auth/facebook:
     get:
       tags:
       - "auth"
       summary: "Logs user into the system by facebook"
-      description: ""
-      operationId: ""
+      operationId: "loginByFacebook"
       responses:
         200:
           description: "successful operation, send a facebook login form"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
   /auth/facebook/callback:
     get:
       tags:
       - "auth"
       summary: "Facebook call this api to return result of authentication"
-      description: ""
-      operationId: ""
+      operationId: "loginByFacebookCallback"
       responses:
-        200:
-          description: "successful operation"
+        301:
+          description: "the server redirect user to homepage"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
   /auth/logout:
-    get:
+    post:
       tags:
       - "auth"
       summary: "Logs out current logged in user session"
-      description: ""
       operationId: "logout"
-      parameters: []
       responses:
-        default:
+        200:
           description: "successful operation"
+          schema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+
   /user/subscriptions:
     get:
       tags:
       - "user"
       summary: "Returns all sources of user available in the database"
-      description: ""
       operationId: "getUserSource"
       parameters:
       - name: "sort"
@@ -89,6 +105,10 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
       security:
       - UserSecurity: []
   /user/saved:
@@ -96,7 +116,6 @@ paths:
       tags:
       - "user"
       summary: "Returns all saved post of user available in the database"
-      description: ""
       operationId: "getUserSavedPost"
       parameters:
       - name: "sort"
@@ -130,14 +149,17 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
       security:
       - UserSecurity: []
   /sources:
     get:
       tags:
-      - "sources"
+      - "source"
       summary: "Returns all sources available in the database"
-      description: ""
       operationId: "allSource"
       parameters:
       - name: "sort"
@@ -167,12 +189,15 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
   /sources/{id}/subscriptions:
     put:
       tags:
-      - "sources"
+      - "source"
       summary: "Subscribe a source"
-      description: ""
       operationId: "subscribeSource"
       parameters:
       - name: "id"
@@ -185,15 +210,16 @@ paths:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Source"
-        404:
-          description: "Source not found"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
       security:
       - UserSecurity: []
     delete:
       tags:
-      - "sources"
+      - "source"
       summary: "Unsubscribe a source"
-      description: ""
       operationId: "unSubscribe"
       parameters:
       - name: "id"
@@ -204,16 +230,17 @@ paths:
       responses:
         200:
           description: "Source unsubscribed"
-        404:
-          description: "Source not found"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
       security:
       - UserSecurity: []
   /posts:
     get:
       tags:
-      - "posts"
+      - "post"
       summary: "Returns all posts available in the database"
-      description: ""
       operationId: "allPost"
       parameters:
       - name: "sort"
@@ -247,12 +274,15 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
   /posts/{id}/{action}:
     put:
       tags:
-      - "posts"
-      summary: "Action for post"
-      description: ""
+      - "post"
+      summary: "Actions for the post"
       operationId: "actionPost"
       parameters:
       - name: "id"
@@ -266,16 +296,47 @@ paths:
         required: true
         type: "string"
         enum:
-          - "new"
-          - "best"
-          - "daily"
+          - "save"
+          - "share"
+          - "view"
       responses:
         200:
           description: "successful operation"
           schema:
             $ref: "#/definitions/Post"
-        404:
-          description: "Post not found"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
+      security:
+      - UserSecurity: []
+    delete:
+      tags:
+      - "post"
+      summary: "Remove action for the post"
+      operationId: "RemoveActionPost"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+      - name: "action"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+        enum:
+          - "save"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/ApiErrorResponse"
       security:
       - UserSecurity: []
 
@@ -402,3 +463,11 @@ definitions:
             type: "integer"
             format: "int64"
             description: "Count number of saves in the post"
+  ApiErrorResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
