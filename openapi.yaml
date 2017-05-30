@@ -33,12 +33,12 @@ paths:
       summary: "Logs user into the system by facebook"
       operationId: "loginByFacebook"
       responses:
-        200:
-          description: "successful operation, send a facebook login form"
+        301:
+          description: "successful operation, the server redirects to Facebook authentication page"
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
   /auth/facebook/callback:
     get:
       tags:
@@ -51,7 +51,7 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
   /auth/logout:
     post:
       tags:
@@ -69,14 +69,14 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
 
   /user/subscriptions:
     get:
       tags:
       - "user"
       summary: "Returns all sources of user available in the database"
-      operationId: "getUserSource"
+      operationId: "getSubscriptions"
       parameters:
       - name: "sort"
         in: "query"
@@ -87,12 +87,20 @@ paths:
         in: "query"
         description: "Limit number of sources return from server"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 1
+        maximum: 100
+        default: 25
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 0
+        maximum: 100
+        default: 0
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -108,7 +116,7 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
   /user/saved:
@@ -116,7 +124,7 @@ paths:
       tags:
       - "user"
       summary: "Returns all saved post of user available in the database"
-      operationId: "getUserSavedPost"
+      operationId: "getSavedPosts"
       parameters:
       - name: "sort"
         in: "query"
@@ -131,12 +139,20 @@ paths:
         in: "query"
         description: "Limit number of posts return from server"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 1
+        maximum: 100
+        default: 25
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 0
+        maximum: 100
+        default: 0
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -152,7 +168,7 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
   /sources:
@@ -160,23 +176,33 @@ paths:
       tags:
       - "source"
       summary: "Returns all sources available in the database"
-      operationId: "allSource"
+      operationId: "getSources"
       parameters:
       - name: "sort"
         in: "query"
         description: "Sort the list of sources by property"
         required: false
         type: "string"
+        enum:
+          - "title"
       - name: "limit"
         in: "query"
         description: "Limit number of sources return from server"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 1
+        maximum: 100
+        default: 25
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 0
+        maximum: 100
+        default: 0
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -192,13 +218,13 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
   /sources/{id}/subscriptions:
     put:
       tags:
       - "source"
       summary: "Subscribe a source"
-      operationId: "subscribeSource"
+      operationId: "subscribe"
       parameters:
       - name: "id"
         in: "path"
@@ -213,14 +239,14 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
     delete:
       tags:
       - "source"
       summary: "Unsubscribe a source"
-      operationId: "unSubscribe"
+      operationId: "unsubscribe"
       parameters:
       - name: "id"
         in: "path"
@@ -233,7 +259,7 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
   /posts:
@@ -241,7 +267,7 @@ paths:
       tags:
       - "post"
       summary: "Returns all posts available in the database"
-      operationId: "allPost"
+      operationId: "getPosts"
       parameters:
       - name: "sort"
         in: "query"
@@ -256,12 +282,20 @@ paths:
         in: "query"
         description: "Limit number of posts return from server"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 1
+        maximum: 100
+        default: 25
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        format: "int64"
+        minimum: 0
+        maximum: 100
+        default: 0
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -277,13 +311,13 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
   /posts/{id}/{action}:
     put:
       tags:
       - "post"
       summary: "Actions for the post"
-      operationId: "actionPost"
+      operationId: "doPost"
       parameters:
       - name: "id"
         in: "path"
@@ -307,14 +341,14 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
     delete:
       tags:
       - "post"
       summary: "Remove action for the post"
-      operationId: "RemoveActionPost"
+      operationId: "removeActivity"
       parameters:
       - name: "id"
         in: "path"
@@ -336,7 +370,7 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
 
@@ -356,62 +390,19 @@ definitions:
       email:
         type: "string"
         description: "Email for the user"
-      token:
-        type: "string"
-        description: "Token for the user when login by email"
-      vendor:
-        type: "string"
-        description: "Vendro for the auth"
-      sources:
-        type: "array"
-        items:
-          type: "string"
-          description: "Reference to source model"
       profile:
         type: "object"
         properties:
-          id:
-            type: "string"
-            description: "Facebook id"
-          username:
-            type: "string"
-            description: "Facebook username"
           displayName:
             type: "string"
             description: "Facebook display name"
-          name:
-            type: "object"
-            properties:
-              familyName:
-                type: "string"
-                description: "Facebook first name"
-              giveName:
-                type: "string"
-                description: "Facebook last name"
-              middleName:
-                type: "string"
-                description: "Facebook middle name"
-          gender:
+          photo:
             type: "string"
-            description: "Facebook gender"
-          profileUrl:
-            type: "string"
-            description: "Facebook profile url"
-          emails:
-            type: "array"
-            description: "Facebook email list"
-            items:
-              type: "string"
-          photos:
-            type: "array"
-            description: "Facebook photo list"
-            items:
-              type: "string"
+            description: "Facebook photo"
   Source:
     type: "object"
     required:
     - "title"
-    - "url"
     properties:
       id:
         type: "string"
@@ -419,9 +410,6 @@ definitions:
       title:
         type: "string"
         description: "Title for the source"
-      url:
-        type: "string"
-        description: "Url for the source"
   Post:
     type: "object"
     required:
@@ -444,9 +432,7 @@ definitions:
         type: "string"
         description: "Url for the post"
       source:
-        type: "string"
-        format: "objectId"
-        description: "Reference to Source model"
+        $ref: "#/definitions/Source"
       meta:
         type: "object"
         description: "Meta of the post"
@@ -463,7 +449,7 @@ definitions:
             type: "integer"
             format: "int64"
             description: "Count number of saves in the post"
-  ApiErrorResponse:
+  Error:
     type: "object"
     properties:
       code:
