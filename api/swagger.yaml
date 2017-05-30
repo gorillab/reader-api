@@ -35,12 +35,13 @@ paths:
       operationId: "loginByFacebook"
       parameters: []
       responses:
-        200:
-          description: "successful operation, send a facebook login form"
+        301:
+          description: "successful operation, the server redirects to Facebook authentication\
+            \ page"
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       x-swagger-router-controller: "Auth"
   /auth/facebook/callback:
     get:
@@ -55,7 +56,7 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       x-swagger-router-controller: "Auth"
   /auth/logout:
     post:
@@ -72,14 +73,14 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       x-swagger-router-controller: "Auth"
   /user/subscriptions:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Returns all sources of user available in the database"
-      operationId: "getUserSource"
+      operationId: "getSubscriptions"
       parameters:
       - name: "sort"
         in: "query"
@@ -90,12 +91,20 @@ paths:
         in: "query"
         description: "Limit number of sources return from server"
         required: false
-        type: "string"
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -111,16 +120,16 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
-      x-swagger-router-controller: "User"
+      x-swagger-router-controller: "Users"
   /user/saved:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Returns all saved post of user available in the database"
-      operationId: "getUserSavedPost"
+      operationId: "getSavedPosts"
       parameters:
       - name: "sort"
         in: "query"
@@ -135,12 +144,20 @@ paths:
         in: "query"
         description: "Limit number of posts return from server"
         required: false
-        type: "string"
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -156,32 +173,42 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
-      x-swagger-router-controller: "User"
+      x-swagger-router-controller: "Users"
   /sources:
     get:
       tags:
-      - "source"
+      - "sources"
       summary: "Returns all sources available in the database"
-      operationId: "allSource"
+      operationId: "getSources"
       parameters:
       - name: "sort"
         in: "query"
         description: "Sort the list of sources by property"
         required: false
         type: "string"
+        enum:
+        - "title"
       - name: "limit"
         in: "query"
         description: "Limit number of sources return from server"
         required: false
-        type: "string"
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -197,14 +224,14 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
-      x-swagger-router-controller: "Source"
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Sources"
   /sources/{id}/subscriptions:
     put:
       tags:
-      - "source"
+      - "sources"
       summary: "Subscribe a source"
-      operationId: "subscribeSource"
+      operationId: "subscribe"
       parameters:
       - name: "id"
         in: "path"
@@ -219,15 +246,15 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
-      x-swagger-router-controller: "Source"
+      x-swagger-router-controller: "Sources"
     delete:
       tags:
-      - "source"
+      - "sources"
       summary: "Unsubscribe a source"
-      operationId: "unSubscribe"
+      operationId: "unsubscribe"
       parameters:
       - name: "id"
         in: "path"
@@ -240,16 +267,16 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
-      x-swagger-router-controller: "Source"
+      x-swagger-router-controller: "Sources"
   /posts:
     get:
       tags:
-      - "post"
+      - "posts"
       summary: "Returns all posts available in the database"
-      operationId: "allPost"
+      operationId: "getPosts"
       parameters:
       - name: "sort"
         in: "query"
@@ -264,12 +291,20 @@ paths:
         in: "query"
         description: "Limit number of posts return from server"
         required: false
-        type: "string"
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
       - name: "page"
         in: "query"
         description: "How many rows to skip"
         required: false
-        type: "string"
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
       - name: "query"
         in: "query"
         description: "Keywords to search"
@@ -285,14 +320,14 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
-      x-swagger-router-controller: "Post"
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Posts"
   /posts/{id}/{action}:
     put:
       tags:
-      - "post"
+      - "posts"
       summary: "Actions for the post"
-      operationId: "actionPost"
+      operationId: "doPost"
       parameters:
       - name: "id"
         in: "path"
@@ -316,15 +351,15 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
-      x-swagger-router-controller: "Post"
+      x-swagger-router-controller: "Posts"
     delete:
       tags:
-      - "post"
+      - "posts"
       summary: "Remove action for the post"
-      operationId: "RemoveActionPost"
+      operationId: "removeActivity"
       parameters:
       - name: "id"
         in: "path"
@@ -346,10 +381,10 @@ paths:
         default:
           description: "error operation"
           schema:
-            $ref: "#/definitions/ApiErrorResponse"
+            $ref: "#/definitions/Error"
       security:
       - UserSecurity: []
-      x-swagger-router-controller: "Post"
+      x-swagger-router-controller: "Posts"
 securityDefinitions:
   UserSecurity:
     type: "basic"
@@ -365,24 +400,12 @@ definitions:
       email:
         type: "string"
         description: "Email for the user"
-      token:
-        type: "string"
-        description: "Token for the user when login by email"
-      vendor:
-        type: "string"
-        description: "Vendro for the auth"
-      sources:
-        type: "array"
-        items:
-          type: "string"
-          description: "Reference to source model"
       profile:
         $ref: "#/definitions/User_profile"
   Source:
     type: "object"
     required:
     - "title"
-    - "url"
     properties:
       id:
         type: "string"
@@ -390,9 +413,6 @@ definitions:
       title:
         type: "string"
         description: "Title for the source"
-      url:
-        type: "string"
-        description: "Url for the source"
   Post:
     type: "object"
     required:
@@ -415,12 +435,10 @@ definitions:
         type: "string"
         description: "Url for the post"
       source:
-        type: "string"
-        format: "objectId"
-        description: "Reference to Source model"
+        $ref: "#/definitions/Source"
       meta:
         $ref: "#/definitions/Post_meta"
-  ApiErrorResponse:
+  Error:
     type: "object"
     properties:
       code:
@@ -432,58 +450,26 @@ definitions:
     properties:
       message:
         type: "string"
-  User_profile_name:
-    properties:
-      familyName:
-        type: "string"
-        description: "Facebook first name"
-      giveName:
-        type: "string"
-        description: "Facebook last name"
-      middleName:
-        type: "string"
-        description: "Facebook middle name"
   User_profile:
     properties:
-      id:
-        type: "string"
-        description: "Facebook id"
-      username:
-        type: "string"
-        description: "Facebook username"
       displayName:
         type: "string"
         description: "Facebook display name"
-      name:
-        $ref: "#/definitions/User_profile_name"
-      gender:
+      photo:
         type: "string"
-        description: "Facebook gender"
-      profileUrl:
-        type: "string"
-        description: "Facebook profile url"
-      emails:
-        type: "array"
-        description: "Facebook email list"
-        items:
-          type: "string"
-      photos:
-        type: "array"
-        description: "Facebook photo list"
-        items:
-          type: "string"
+        description: "Facebook photo"
   Post_meta:
     properties:
       numViewed:
         type: "integer"
-        format: "int64"
+        format: "int32"
         description: "Count number of views in the post"
       numShared:
         type: "integer"
-        format: "int64"
+        format: "int32"
         description: "Count number of shares in the post"
       numSaved:
         type: "integer"
-        format: "int64"
+        format: "int32"
         description: "Count number of saves in the post"
     description: "Meta of the post"

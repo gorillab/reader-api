@@ -1,12 +1,12 @@
 'use strict';
 
-exports.getUserSavedPost = function(args, res, next) {
+exports.getSavedPosts = function(args, res, next) {
   /**
    * Returns all saved post of user available in the database
    *
    * sort String Sort the list of posts by property (optional)
-   * limit String Limit number of posts return from server (optional)
-   * page String How many rows to skip (optional)
+   * limit Integer Limit number of posts return from server (optional)
+   * page Integer How many rows to skip (optional)
    * query String Keywords to search (optional)
    * returns List
    **/
@@ -19,7 +19,10 @@ exports.getUserSavedPost = function(args, res, next) {
     "numSaved" : 1
   },
   "id" : "aeiou",
-  "source" : "aeiou",
+  "source" : {
+    "id" : "aeiou",
+    "title" : "aeiou"
+  },
   "title" : "aeiou",
   "content" : "aeiou",
   "url" : "aeiou"
@@ -32,21 +35,20 @@ exports.getUserSavedPost = function(args, res, next) {
   }
 }
 
-exports.getUserSource = function(args, res, next) {
+exports.getSubscriptions = function(args, res, next) {
   /**
    * Returns all sources of user available in the database
    *
    * sort String Sort the list of sources by property (optional)
-   * limit String Limit number of sources return from server (optional)
-   * page String How many rows to skip (optional)
+   * limit Integer Limit number of sources return from server (optional)
+   * page Integer How many rows to skip (optional)
    * query String Keywords to search (optional)
    * returns List
    **/
   var examples = {};
   examples['application/json'] = [ {
   "id" : "aeiou",
-  "title" : "aeiou",
-  "url" : "aeiou"
+  "title" : "aeiou"
 } ];
   if (Object.keys(examples).length > 0) {
     res.setHeader('Content-Type', 'application/json');

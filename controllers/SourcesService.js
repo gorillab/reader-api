@@ -1,20 +1,19 @@
 'use strict';
 
-exports.allSource = function(args, res, next) {
+exports.getSources = function(args, res, next) {
   /**
    * Returns all sources available in the database
    *
    * sort String Sort the list of sources by property (optional)
-   * limit String Limit number of sources return from server (optional)
-   * page String How many rows to skip (optional)
+   * limit Integer Limit number of sources return from server (optional)
+   * page Integer How many rows to skip (optional)
    * query String Keywords to search (optional)
    * returns List
    **/
   var examples = {};
   examples['application/json'] = [ {
   "id" : "aeiou",
-  "title" : "aeiou",
-  "url" : "aeiou"
+  "title" : "aeiou"
 } ];
   if (Object.keys(examples).length > 0) {
     res.setHeader('Content-Type', 'application/json');
@@ -24,7 +23,7 @@ exports.allSource = function(args, res, next) {
   }
 }
 
-exports.subscribeSource = function(args, res, next) {
+exports.subscribe = function(args, res, next) {
   /**
    * Subscribe a source
    *
@@ -34,8 +33,7 @@ exports.subscribeSource = function(args, res, next) {
   var examples = {};
   examples['application/json'] = {
   "id" : "aeiou",
-  "title" : "aeiou",
-  "url" : "aeiou"
+  "title" : "aeiou"
 };
   if (Object.keys(examples).length > 0) {
     res.setHeader('Content-Type', 'application/json');
@@ -45,7 +43,7 @@ exports.subscribeSource = function(args, res, next) {
   }
 }
 
-exports.unSubscribe = function(args, res, next) {
+exports.unsubscribe = function(args, res, next) {
   /**
    * Unsubscribe a source
    *

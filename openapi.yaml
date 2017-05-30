@@ -74,7 +74,7 @@ paths:
   /user/subscriptions:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Returns all sources of user available in the database"
       operationId: "getSubscriptions"
       parameters:
@@ -88,7 +88,7 @@ paths:
         description: "Limit number of sources return from server"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 1
         maximum: 100
         default: 25
@@ -97,7 +97,7 @@ paths:
         description: "How many rows to skip"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 0
         maximum: 100
         default: 0
@@ -122,7 +122,7 @@ paths:
   /user/saved:
     get:
       tags:
-      - "user"
+      - "users"
       summary: "Returns all saved post of user available in the database"
       operationId: "getSavedPosts"
       parameters:
@@ -140,7 +140,7 @@ paths:
         description: "Limit number of posts return from server"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 1
         maximum: 100
         default: 25
@@ -149,7 +149,7 @@ paths:
         description: "How many rows to skip"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 0
         maximum: 100
         default: 0
@@ -174,7 +174,7 @@ paths:
   /sources:
     get:
       tags:
-      - "source"
+      - "sources"
       summary: "Returns all sources available in the database"
       operationId: "getSources"
       parameters:
@@ -190,7 +190,7 @@ paths:
         description: "Limit number of sources return from server"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 1
         maximum: 100
         default: 25
@@ -199,7 +199,7 @@ paths:
         description: "How many rows to skip"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 0
         maximum: 100
         default: 0
@@ -222,7 +222,7 @@ paths:
   /sources/{id}/subscriptions:
     put:
       tags:
-      - "source"
+      - "sources"
       summary: "Subscribe a source"
       operationId: "subscribe"
       parameters:
@@ -244,7 +244,7 @@ paths:
       - UserSecurity: []
     delete:
       tags:
-      - "source"
+      - "sources"
       summary: "Unsubscribe a source"
       operationId: "unsubscribe"
       parameters:
@@ -265,7 +265,7 @@ paths:
   /posts:
     get:
       tags:
-      - "post"
+      - "posts"
       summary: "Returns all posts available in the database"
       operationId: "getPosts"
       parameters:
@@ -283,7 +283,7 @@ paths:
         description: "Limit number of posts return from server"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 1
         maximum: 100
         default: 25
@@ -292,7 +292,7 @@ paths:
         description: "How many rows to skip"
         required: false
         type: "integer"
-        format: "int64"
+        format: "int32"
         minimum: 0
         maximum: 100
         default: 0
@@ -315,7 +315,7 @@ paths:
   /posts/{id}/{action}:
     put:
       tags:
-      - "post"
+      - "posts"
       summary: "Actions for the post"
       operationId: "doPost"
       parameters:
@@ -346,7 +346,7 @@ paths:
       - UserSecurity: []
     delete:
       tags:
-      - "post"
+      - "posts"
       summary: "Remove action for the post"
       operationId: "removeActivity"
       parameters:
@@ -439,15 +439,15 @@ definitions:
         properties:
           numViewed:
             type: "integer"
-            format: "int64"
+            format: "int32"
             description: "Count number of views in the post"
           numShared:
             type: "integer"
-            format: "int64"
+            format: "int32"
             description: "Count number of shares in the post"
           numSaved:
             type: "integer"
-            format: "int64"
+            format: "int32"
             description: "Count number of saves in the post"
   Error:
     type: "object"

@@ -1,6 +1,6 @@
 'use strict';
 
-exports.actionPost = function(args, res, next) {
+exports.doPost = function(args, res, next) {
   /**
    * Actions for the post
    *
@@ -17,7 +17,10 @@ exports.actionPost = function(args, res, next) {
     "numSaved" : 1
   },
   "id" : "aeiou",
-  "source" : "aeiou",
+  "source" : {
+    "id" : "aeiou",
+    "title" : "aeiou"
+  },
   "title" : "aeiou",
   "content" : "aeiou",
   "url" : "aeiou"
@@ -30,13 +33,13 @@ exports.actionPost = function(args, res, next) {
   }
 }
 
-exports.allPost = function(args, res, next) {
+exports.getPosts = function(args, res, next) {
   /**
    * Returns all posts available in the database
    *
    * sort String Sort the list of posts by property (optional)
-   * limit String Limit number of posts return from server (optional)
-   * page String How many rows to skip (optional)
+   * limit Integer Limit number of posts return from server (optional)
+   * page Integer How many rows to skip (optional)
    * query String Keywords to search (optional)
    * returns List
    **/
@@ -49,7 +52,10 @@ exports.allPost = function(args, res, next) {
     "numSaved" : 1
   },
   "id" : "aeiou",
-  "source" : "aeiou",
+  "source" : {
+    "id" : "aeiou",
+    "title" : "aeiou"
+  },
   "title" : "aeiou",
   "content" : "aeiou",
   "url" : "aeiou"
@@ -62,7 +68,7 @@ exports.allPost = function(args, res, next) {
   }
 }
 
-exports.removeActionPost = function(args, res, next) {
+exports.removeActivity = function(args, res, next) {
   /**
    * Remove action for the post
    *
@@ -79,7 +85,10 @@ exports.removeActionPost = function(args, res, next) {
     "numSaved" : 1
   },
   "id" : "aeiou",
-  "source" : "aeiou",
+  "source" : {
+    "id" : "aeiou",
+    "title" : "aeiou"
+  },
   "title" : "aeiou",
   "content" : "aeiou",
   "url" : "aeiou"
