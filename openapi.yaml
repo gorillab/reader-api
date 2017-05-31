@@ -19,11 +19,11 @@ produces:
 tags:
 - name: "auth"
   description: "Auth module"
-- name: "user"
+- name: "users"
   description: "User module"
-- name: "source"
+- name: "sources"
   description: "Source module"
-- name: "post"
+- name: "posts"
   description: "Post module"
 paths:
   /auth/facebook:
