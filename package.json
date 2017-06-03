@@ -1,0 +1,31 @@
+{
+  "name": "reader-api",
+  "version": "1.0.0",
+  "description": "This api service served to end users or third-party apps/services",
+  "author": {
+    "name": "Gorillab",
+    "email": "hello@gorillab.co",
+    "url": "https://gorillab.co/"
+  },
+  "engines": {
+    "node": ">=6"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "main": "index.js",
+  "scripts": {
+	"prestart": "npm install",
+	"start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "private": true,
+  "dependencies": {
+    "connect": "^3.2.0",
+    "js-yaml": "^3.3.0",
+    "swagger-tools": "0.10.1"
+  }
+}
