@@ -1,6 +1,6 @@
-const url = require('url');
+import url from 'url';
 
-const Posts = require('./PostsService');
+import Posts from './PostsService';
 
 export function doPost(req, res, next) {
   Posts.doPost(req.swagger.params, res, next);

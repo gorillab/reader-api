@@ -1,6 +1,6 @@
-const url = require('url');
+import url from 'url';
 
-const Sources = require('./SourcesService');
+import Sources from './SourcesService';
 
 export function getSources(req, res, next) {
   Sources.getSources(req.swagger.params, res, next);

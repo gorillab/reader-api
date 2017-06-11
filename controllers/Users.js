@@ -1,6 +1,6 @@
-const url = require('url');
+import url from 'url';
 
-const Users = require('./UsersService');
+import Users from './UsersService';
 
 export function getSavedPosts(req, res, next) {
   Users.getSavedPosts(req.swagger.params, res, next);

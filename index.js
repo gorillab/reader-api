@@ -1,10 +1,12 @@
-const fs = require('fs'),
-    path = require('path'),
-    http = require('http');
+import fs from 'fs';
+import path from 'path';
+import http from 'http';
+import swaggerTools from 'swagger-tools';
+import jsyaml from 'js-yaml';
+import connect from 'connect';
 
-const app = require('connect')();
-const swaggerTools = require('swagger-tools');
-const jsyaml = require('js-yaml');
+const app = connect();
+
 const serverPort = 3000;
 
 // swaggerRouter configuration

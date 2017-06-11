@@ -53,3 +53,4 @@ export function logout(args, res, next) {
     res.end();
   }
 }
+

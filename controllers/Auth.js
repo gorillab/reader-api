@@ -1,6 +1,6 @@
-const url = require('url');
+import url from 'url';
 
-const Auth = require('./AuthService');
+import Auth from './AuthService';
 
 export function loginByFacebook(req, res, next) {
   Auth.loginByFacebook(req.swagger.params, res, next);
