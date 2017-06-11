@@ -1,6 +1,4 @@
-'use strict';
-
-exports.getSources = (args, res, next) => {
+export function getSources(args, res, next) {
   /**
    * Returns all sources available in the database
    *
@@ -23,7 +21,7 @@ exports.getSources = (args, res, next) => {
   }
 }
 
-exports.subscribe = (args, res, next) => {
+export function subscribe(args, res, next) {
   /**
    * Subscribe a source
    *
@@ -43,7 +41,7 @@ exports.subscribe = (args, res, next) => {
   }
 }
 
-exports.unsubscribe = (args, res, next) => {
+export function unsubscribe(args, res, next) {
   /**
    * Unsubscribe a source
    *

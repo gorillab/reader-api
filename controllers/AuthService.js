@@ -1,6 +1,4 @@
-'use strict';
-
-exports.loginByFacebook = (args, res, next) => {
+export function loginByFacebook(args, res, next) {
   /**
    * Logs user into the system by facebook
    *
@@ -19,7 +17,7 @@ exports.loginByFacebook = (args, res, next) => {
   }
 }
 
-exports.loginByFacebookCallback = (args, res, next) => {
+export function loginByFacebookCallback(args, res, next) {
   /**
    * Facebook call this api to return result of authentication
    *
@@ -38,7 +36,7 @@ exports.loginByFacebookCallback = (args, res, next) => {
   }
 }
 
-exports.logout = (args, res, next) => {
+export function logout(args, res, next) {
   /**
    * Logs out current logged in user session
    *

@@ -1,6 +1,4 @@
-'use strict';
-
-exports.doPost = (args, res, next) => {
+export function doPost(args, res, next) {
   /**
    * Actions for the post
    *
@@ -33,7 +31,7 @@ exports.doPost = (args, res, next) => {
   }
 }
 
-exports.getPosts = (args, res, next) => {
+export function getPosts(args, res, next) {
   /**
    * Returns all posts available in the database
    *
@@ -68,7 +66,7 @@ exports.getPosts = (args, res, next) => {
   }
 }
 
-exports.removeActivity = (args, res, next) => {
+export function removeActivity(args, res, next) {
   /**
    * Remove action for the post
    *

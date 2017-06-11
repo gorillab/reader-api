@@ -1,6 +1,4 @@
-'use strict';
-
-exports.getSavedPosts = (args, res, next) => {
+export function getSavedPosts(args, res, next) {
   /**
    * Returns all saved post of user available in the database
    *
@@ -35,7 +33,7 @@ exports.getSavedPosts = (args, res, next) => {
   }
 }
 
-exports.getSubscriptions = (args, res, next) => {
+export function getSubscriptions(args, res, next) {
   /**
    * Returns all sources of user available in the database
    *
