@@ -19,10 +19,6 @@
 	"prestart": "npm install",
 	"start": "node index.js"
   },
-  "keywords": [
-    "swagger"
-  ],
-  "private": true,
   "dependencies": {
     "connect": "^3.2.0",
     "js-yaml": "^3.3.0",

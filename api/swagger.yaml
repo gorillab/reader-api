@@ -13,11 +13,11 @@ basePath: "/api/v1"
 tags:
 - name: "auth"
   description: "Auth module"
-- name: "user"
+- name: "users"
   description: "User module"
-- name: "source"
+- name: "sources"
   description: "Source module"
-- name: "post"
+- name: "posts"
   description: "Post module"
 schemes:
 - "http"
@@ -473,3 +473,4 @@ definitions:
         format: "int32"
         description: "Count number of saves in the post"
     description: "Meta of the post"
+
