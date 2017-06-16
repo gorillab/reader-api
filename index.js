@@ -17,6 +17,7 @@ const options = {
 };
 
 // The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
+console.log(path.join(__dirname,'api/swagger.yaml'));
 const spec = fs.readFileSync(path.join(__dirname,'api/swagger.yaml'), 'utf8');
 const swaggerDoc = jsyaml.safeLoad(spec);
 

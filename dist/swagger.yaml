@@ -1,0 +1,476 @@
+---
+swagger: "2.0"
+info:
+  description: "This api service served to end users or third-party apps/services"
+  version: "1.0.0"
+  title: "Reader API"
+  contact:
+    name: "Gorillab"
+    url: "https://gorillab.co/"
+    email: "hello@gorillab.co"
+host: "localhost:3000"
+basePath: "/api/v1"
+tags:
+- name: "auth"
+  description: "Auth module"
+- name: "users"
+  description: "User module"
+- name: "sources"
+  description: "Source module"
+- name: "posts"
+  description: "Post module"
+schemes:
+- "http"
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /auth/facebook:
+    get:
+      tags:
+      - "auth"
+      summary: "Logs user into the system by facebook"
+      operationId: "loginByFacebook"
+      parameters: []
+      responses:
+        301:
+          description: "successful operation, the server redirects to Facebook authentication\
+            \ page"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Auth"
+  /auth/facebook/callback:
+    get:
+      tags:
+      - "auth"
+      summary: "Facebook call this api to return result of authentication"
+      operationId: "loginByFacebookCallback"
+      parameters: []
+      responses:
+        301:
+          description: "the server redirect user to homepage"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Auth"
+  /auth/logout:
+    post:
+      tags:
+      - "auth"
+      summary: "Logs out current logged in user session"
+      operationId: "logout"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/inline_response_200"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Auth"
+  /user/subscriptions:
+    get:
+      tags:
+      - "users"
+      summary: "Returns all sources of user available in the database"
+      operationId: "getSubscriptions"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of sources by property"
+        required: false
+        type: "string"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of sources return from server"
+        required: false
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Users"
+  /user/saved:
+    get:
+      tags:
+      - "users"
+      summary: "Returns all saved post of user available in the database"
+      operationId: "getSavedPosts"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of posts by property"
+        required: false
+        type: "string"
+        enum:
+        - "new"
+        - "best"
+        - "daily"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of posts return from server"
+        required: false
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Users"
+  /sources:
+    get:
+      tags:
+      - "sources"
+      summary: "Returns all sources available in the database"
+      operationId: "getSources"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of sources by property"
+        required: false
+        type: "string"
+        enum:
+        - "title"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of sources return from server"
+        required: false
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Sources"
+  /sources/{id}/subscriptions:
+    put:
+      tags:
+      - "sources"
+      summary: "Subscribe a source"
+      operationId: "subscribe"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Source id to subscibe"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Sources"
+    delete:
+      tags:
+      - "sources"
+      summary: "Unsubscribe a source"
+      operationId: "unsubscribe"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the source to delete"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Source unsubscribed"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Sources"
+  /posts:
+    get:
+      tags:
+      - "posts"
+      summary: "Returns all posts available in the database"
+      operationId: "getPosts"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of posts by property"
+        required: false
+        type: "string"
+        enum:
+        - "new"
+        - "best"
+        - "daily"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of posts return from server"
+        required: false
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Posts"
+  /posts/{id}/{action}:
+    put:
+      tags:
+      - "posts"
+      summary: "Actions for the post"
+      operationId: "doPost"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Post id to view/save/share"
+        required: true
+        type: "string"
+      - name: "action"
+        in: "path"
+        description: "Post id to view/save/share"
+        required: true
+        type: "string"
+        enum:
+        - "save"
+        - "share"
+        - "view"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Posts"
+    delete:
+      tags:
+      - "posts"
+      summary: "Remove action for the post"
+      operationId: "removeActivity"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+      - name: "action"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+        enum:
+        - "save"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Posts"
+securityDefinitions:
+  UserSecurity:
+    type: "basic"
+definitions:
+  User:
+    type: "object"
+    required:
+    - "email"
+    properties:
+      id:
+        type: "string"
+        description: "Id for the user"
+      email:
+        type: "string"
+        description: "Email for the user"
+      profile:
+        $ref: "#/definitions/User_profile"
+  Source:
+    type: "object"
+    required:
+    - "title"
+    properties:
+      id:
+        type: "string"
+        description: "Id for the source"
+      title:
+        type: "string"
+        description: "Title for the source"
+  Post:
+    type: "object"
+    required:
+    - "title"
+    - "url"
+    properties:
+      id:
+        type: "string"
+        description: "Id for the post"
+      title:
+        type: "string"
+        description: "Title for the post"
+      content:
+        type: "string"
+        description: "Content for the post"
+      image:
+        type: "string"
+        description: "Image path for the post"
+      url:
+        type: "string"
+        description: "Url for the post"
+      source:
+        $ref: "#/definitions/Source"
+      meta:
+        $ref: "#/definitions/Post_meta"
+  Error:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      message:
+        type: "string"
+  inline_response_200:
+    properties:
+      message:
+        type: "string"
+  User_profile:
+    properties:
+      displayName:
+        type: "string"
+        description: "Facebook display name"
+      photo:
+        type: "string"
+        description: "Facebook photo"
+  Post_meta:
+    properties:
+      numViewed:
+        type: "integer"
+        format: "int32"
+        description: "Count number of views in the post"
+      numShared:
+        type: "integer"
+        format: "int32"
+        description: "Count number of shares in the post"
+      numSaved:
+        type: "integer"
+        format: "int32"
+        description: "Count number of saves in the post"
+    description: "Meta of the post"
+
