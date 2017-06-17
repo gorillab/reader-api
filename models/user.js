@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
   source: [
     {
       type: Schema.ObjectId,
-      ref: 'User'
+      ref: 'Source'
     }
   ],
   profile: {
@@ -55,7 +55,8 @@ const UserSchema = new mongoose.Schema({
     },
     gender: {
       type: String,
-      trim: true
+      trim: true,
+      enum: ['male', 'female']
     },
     profileUrl: {
       type: String,
@@ -75,14 +76,43 @@ const UserSchema = new mongoose.Schema({
       }
     ]
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
   isDeleted: {
-      type: Boolean,
-      default: false,
+    type: Boolean,
+    default: false,
+    select: false
+  },
+  created: {
+    at: {
+      type: Date,
+      default: Date.now
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
       select: false
+    }
+  },
+  updated: {
+    at: {
+      type: Date,
+      select: false
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      select: false
+    }
+  },
+  deleted: {
+    at: {
+      type: Date,
+      select: false
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      select: false
+    }
   }
 });
 

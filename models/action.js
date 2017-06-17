@@ -21,19 +21,47 @@ const ActionSchema = new mongoose.Schema({
     required: true,
     enum: ['Post', 'Source']
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
   isDeleted: {
-      type: Boolean,
-      default: false,
+    type: Boolean,
+    default: false,
+    select: false
+  },
+  created: {
+    at: {
+      type: Date,
+      default: Date.now
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
       select: false
+    }
+  },
+  updated: {
+    at: {
+      type: Date,
+      select: false
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      select: false
+    }
+  },
+  deleted: {
+    at: {
+      type: Date,
+      select: false
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      select: false
+    }
   }
 });
 
-ActionSchema.method({
-});
+ActionSchema.method({});
 
 ActionSchema.statics = {
   /**
@@ -51,7 +79,10 @@ ActionSchema.statics = {
    * @param {number} limit - Limit number of actions to be returned.
    * @returns {Promise<User[]>}
    */
-  list({ skip = 0, limit = 25 } = {}) {
+  list({
+    skip = 0,
+    limit = 25
+  } = {}) {
     return true
   }
 };

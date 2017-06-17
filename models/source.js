@@ -12,14 +12,43 @@ const SourceSchema = new mongoose.Schema({
     trim: true,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
   isDeleted: {
-      type: Boolean,
-      default: false,
+    type: Boolean,
+    default: false,
+    select: false
+  },
+  created: {
+    at: {
+      type: Date,
+      default: Date.now
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
       select: false
+    }
+  },
+  updated: {
+    at: {
+      type: Date,
+      select: false
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      select: false
+    }
+  },
+  deleted: {
+    at: {
+      type: Date,
+      select: false
+    },
+    by: {
+      type: Schema.ObjectId,
+      ref: 'User',
+      select: false
+    }
   }
 });
 
