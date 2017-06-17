@@ -1,12 +1,10 @@
-'use strict';
-
-exports.loginByFacebook = function(args, res, next) {
+export function loginByFacebook(args, res, next) {
   /**
    * Logs user into the system by facebook
    *
    * returns Error
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = {
   "code" : 0,
   "message" : "aeiou"
@@ -19,13 +17,13 @@ exports.loginByFacebook = function(args, res, next) {
   }
 }
 
-exports.loginByFacebookCallback = function(args, res, next) {
+export function loginByFacebookCallback(args, res, next) {
   /**
    * Facebook call this api to return result of authentication
    *
    * returns Error
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = {
   "code" : 0,
   "message" : "aeiou"
@@ -38,13 +36,13 @@ exports.loginByFacebookCallback = function(args, res, next) {
   }
 }
 
-exports.logout = function(args, res, next) {
+export function logout(args, res, next) {
   /**
    * Logs out current logged in user session
    *
    * returns inline_response_200
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = {
   "message" : "aeiou"
 };

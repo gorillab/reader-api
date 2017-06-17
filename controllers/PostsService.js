@@ -1,6 +1,4 @@
-'use strict';
-
-exports.doPost = function(args, res, next) {
+export function doPost(args, res, next) {
   /**
    * Actions for the post
    *
@@ -8,7 +6,7 @@ exports.doPost = function(args, res, next) {
    * action String Post id to view/save/share
    * returns Post
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = {
   "image" : "aeiou",
   "meta" : {
@@ -33,7 +31,7 @@ exports.doPost = function(args, res, next) {
   }
 }
 
-exports.getPosts = function(args, res, next) {
+export function getPosts(args, res, next) {
   /**
    * Returns all posts available in the database
    *
@@ -43,7 +41,7 @@ exports.getPosts = function(args, res, next) {
    * query String Keywords to search (optional)
    * returns List
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = [ {
   "image" : "aeiou",
   "meta" : {
@@ -68,7 +66,7 @@ exports.getPosts = function(args, res, next) {
   }
 }
 
-exports.removeActivity = function(args, res, next) {
+export function removeActivity(args, res, next) {
   /**
    * Remove action for the post
    *
@@ -76,7 +74,7 @@ exports.removeActivity = function(args, res, next) {
    * action String Post id
    * returns Post
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = {
   "image" : "aeiou",
   "meta" : {

@@ -1,6 +1,4 @@
-'use strict';
-
-exports.getSources = function(args, res, next) {
+export function getSources(args, res, next) {
   /**
    * Returns all sources available in the database
    *
@@ -10,7 +8,7 @@ exports.getSources = function(args, res, next) {
    * query String Keywords to search (optional)
    * returns List
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = [ {
   "id" : "aeiou",
   "title" : "aeiou"
@@ -23,14 +21,14 @@ exports.getSources = function(args, res, next) {
   }
 }
 
-exports.subscribe = function(args, res, next) {
+export function subscribe(args, res, next) {
   /**
    * Subscribe a source
    *
    * id String Source id to subscibe
    * returns Source
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = {
   "id" : "aeiou",
   "title" : "aeiou"
@@ -43,7 +41,7 @@ exports.subscribe = function(args, res, next) {
   }
 }
 
-exports.unsubscribe = function(args, res, next) {
+export function unsubscribe(args, res, next) {
   /**
    * Unsubscribe a source
    *

@@ -1,17 +1,15 @@
-'use strict';
+import url from 'url';
 
-var url = require('url');
+import Posts from './PostsService';
 
-var Posts = require('./PostsService');
-
-module.exports.doPost = function doPost (req, res, next) {
+export function doPost(req, res, next) {
   Posts.doPost(req.swagger.params, res, next);
 };
 
-module.exports.getPosts = function getPosts (req, res, next) {
+export function getPosts(req, res, next) {
   Posts.getPosts(req.swagger.params, res, next);
 };
 
-module.exports.removeActivity = function removeActivity (req, res, next) {
+export function removeActivity(req, res, next) {
   Posts.removeActivity(req.swagger.params, res, next);
 };

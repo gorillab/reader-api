@@ -1,6 +1,4 @@
-'use strict';
-
-exports.getSavedPosts = function(args, res, next) {
+export function getSavedPosts(args, res, next) {
   /**
    * Returns all saved post of user available in the database
    *
@@ -10,7 +8,7 @@ exports.getSavedPosts = function(args, res, next) {
    * query String Keywords to search (optional)
    * returns List
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = [ {
   "image" : "aeiou",
   "meta" : {
@@ -35,7 +33,7 @@ exports.getSavedPosts = function(args, res, next) {
   }
 }
 
-exports.getSubscriptions = function(args, res, next) {
+export function getSubscriptions(args, res, next) {
   /**
    * Returns all sources of user available in the database
    *
@@ -45,7 +43,7 @@ exports.getSubscriptions = function(args, res, next) {
    * query String Keywords to search (optional)
    * returns List
    **/
-  var examples = {};
+  let examples = {};
   examples['application/json'] = [ {
   "id" : "aeiou",
   "title" : "aeiou"
