@@ -52,7 +52,7 @@ mongoose.connection.on('open', () => {
 
 });
 mongoose.connection.on('error', (err) => {
-  console.log('--> Mongoose failed to connect:', db_mongo.mongodb.url, err);
+  console.log('--> Mongoose failed to connect:', db.mongodb.url, err);
   mongoose.disconnect();
 });
 mongoose.connection.on('close', () => {
