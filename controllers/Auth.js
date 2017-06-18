@@ -1,6 +1,6 @@
 import url from 'url';
 
-import Auth from './AuthService';
+import * as Auth from './AuthService';
 
 export function loginByFacebook(req, res, next) {
   Auth.loginByFacebook(req.swagger.params, res, next);

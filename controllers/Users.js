@@ -1,6 +1,6 @@
 import url from 'url';
 
-import Users from './UsersService';
+import * as Users from './UsersService';
 
 export function getSavedPosts(req, res, next) {
   Users.getSavedPosts(req.swagger.params, res, next);

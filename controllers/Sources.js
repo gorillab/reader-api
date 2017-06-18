@@ -1,6 +1,6 @@
 import url from 'url';
 
-import Sources from './SourcesService';
+import * as Sources from './SourcesService';
 
 export function getSources(req, res, next) {
   Sources.getSources(req.swagger.params, res, next);
