@@ -3,11 +3,11 @@ import path from 'path';
 import http from 'http';
 import swaggerTools from 'swagger-tools';
 import jsyaml from 'js-yaml';
-import connect from 'connect';
+import express from 'express';
 import db from './config/database.js';
 import mongoose from 'mongoose';
 
-const app = connect();
+const app = express();
 const serverPort = 3000;
 
 // swaggerRouter configuration
