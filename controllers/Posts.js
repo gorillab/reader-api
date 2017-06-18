@@ -1,6 +1,6 @@
 import url from 'url';
 
-import Posts from './PostsService';
+import * as Posts from './PostsService';
 
 export function doPost(req, res, next) {
   Posts.doPost(req.swagger.params, res, next);
