@@ -22,12 +22,13 @@
     "serve": "node dist/index.js"
   },
   "dependencies": {
-    "connect": "^3.2.0",
+    "express": "^4.15.3",
+    "http-status": "^1.0.1",
     "js-yaml": "^3.3.0",
-    "swagger-tools": "0.10.1",
     "mongoose": "4.6.5",
     "mongoose-deep-populate": "^3.0.0",
-    "mongoose-unique-validator": "1.0.2"
+    "mongoose-unique-validator": "1.0.2",
+    "swagger-tools": "0.10.1"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
