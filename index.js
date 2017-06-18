@@ -6,9 +6,9 @@ import jsyaml from 'js-yaml';
 import express from 'express';
 import db from './config/database.js';
 import mongoose from 'mongoose';
+import {host, port} from './config/index.js';
 
 const app = express();
-const serverPort = 3000;
 
 // swaggerRouter configuration
 const options = {
@@ -44,9 +44,9 @@ mongoose.connection.on('open', () => {
     app.use(middleware.swaggerUi());
 
     // Start the server
-    http.createServer(app).listen(serverPort, () => {
-      console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
-      console.log('Swagger-ui is available on http://localhost:%d/docs', serverPort);
+    http.createServer(app).listen(port, host, () => {
+      console.log('Your server is listening on port %d (http://localhost:%d)', port, port);
+      console.log('Swagger-ui is available on http://localhost:%d/docs', port);
     });
   });
 
