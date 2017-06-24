@@ -7,7 +7,6 @@ const UserSchema = new mongoose.Schema({
     match: [
       /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please enter a valid email'
     ],
-    required: true,
     trim: true,
     lowercase: true
   },
@@ -20,7 +19,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  source: [
+  sources: [
     {
       type: Schema.ObjectId,
       ref: 'Source'
@@ -75,45 +74,25 @@ const UserSchema = new mongoose.Schema({
         trim: true
       }
     ]
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-    select: false
-  },
-  created: {
-    at: {
-      type: Date,
-      default: Date.now
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  updated: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  deleted: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
   }
 });
+
+UserSchema.method({});
+
+UserSchema.statics = {
+  get: function(options, cb) {
+    options.select = options.select || 'email source profile';
+    return this.findOne(options.query).select(options.select).exec(cb);
+  },
+  list: function(options) {
+    const query = options.query || {};
+    const page = options.page || 0;
+    const sort = options.sort || '-created.at';
+    const limit = options.limit || 0;
+    const select = options.select || '';
+
+    return this.find(query).sort(sort).select(select).limit(limit).skip(limit * page).exec();
+  }
+};
 
 export default mongoose.model('User', UserSchema);
