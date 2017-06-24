@@ -5,7 +5,7 @@ const ActionSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['view', 'share', 'save']
+    enum: ['view', 'share', 'save', 'subscribe', 'unsubscribe']
   },
   user: {
     type: Schema.ObjectId,
@@ -20,70 +20,20 @@ const ActionSchema = new mongoose.Schema({
     type: String,
     required: true,
     enum: ['Post', 'Source']
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-    select: false
-  },
-  created: {
-    at: {
-      type: Date,
-      default: Date.now
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  updated: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  deleted: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
   }
 });
 
 ActionSchema.method({});
 
 ActionSchema.statics = {
-  /**
-   * Get user
-   * @param {ObjectId} id - The objectId of action.
-   * @returns {Promise<Action, APIError>}
-   */
-  get(id) {
-    return true
-  },
+  list: function(options) {
+    const query = options.query || {};
+    const page = options.page || 0;
+    const sort = options.sort || '-created.at';
+    const limit = options.limit || 0;
+    const select = options.select || '';
 
-  /**
-   * List actions in descending order of 'created' timestamp.
-   * @param {number} skip - Number of actions to be skipped.
-   * @param {number} limit - Limit number of actions to be returned.
-   * @returns {Promise<User[]>}
-   */
-  list({
-    skip = 0,
-    limit = 25
-  } = {}) {
-    return true
+    return this.find(query).sort(sort).select(select).limit(limit).skip(limit * page).exec();
   }
 };
 
