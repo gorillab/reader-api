@@ -1,58 +1,107 @@
-export function getSavedPosts(args, res, next) {
-  /**
-   * Returns all saved post of user available in the database
-   *
-   * sort String Sort the list of posts by property (optional)
-   * limit Integer Limit number of posts return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
+import httpStatus from 'http-status';
+
+import APIError from '../helper/APIError.js';
+
+import User from '../models/user.js';
+import Post from '../models/post.js';
+import Source from '../models/source.js';
+import Action from '../models/action.js';
+
+import {isLoggedin} from '../middlewares/auth.js';
+
+export async function getSavedPosts(req, res, next) {
+  await isLoggedin(req, res, next);
+
+  const args = req.swagger.params;
+  let query = {
+    type: 'save',
+    entityType: 'Post',
+    user: req.user._id
+  };
+
+  let options = {
+    select: 'entity',
+    query: query
+  };
+
+  let postIds = await Action.list(options).then(actions => {
+    return actions.map(action => {
+      return action.entity.toString();
+    });
+  }).catch(e => next(e));
+
+  // get posts
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  query = {
+    isDeleted: false,
+    _id: {
+      $in: postIds
+    }
+  };
+
+  console.log(query);
+
+  if (args.query.value) {
+    query['$or'] = [
+      {
+        title: RegExp(args.query.value, 'i')
+      }
+    ];
   }
+
+  options = {
+    limit: limit,
+    page: page,
+    sort: sort,
+    query: query
+  };
+
+  Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
 }
 
-export function getSubscriptions(args, res, next) {
-  /**
-   * Returns all sources of user available in the database
-   *
-   * sort String Sort the list of sources by property (optional)
-   * limit Integer Limit number of sources return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "id" : "aeiou",
-  "title" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
-}
+export async function getSubscriptions(req, res, next) {
+  await isLoggedin(req, res, next);
 
+  const args = req.swagger.params;
+
+  let sourceIds = req.user.sources.map(sourceId => {
+    return sourceId.toString();
+  });
+
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  const query = {
+    isDeleted: false,
+    _id: {
+      $in: sourceIds
+    }
+  };
+
+  if (args.query.value) {
+    query['$or'] = [
+      {
+        title: RegExp(args.query.value, 'i')
+      }
+    ];
+  }
+
+  const options = {
+    limit: limit,
+    page: page,
+    sort: sort,
+    query: query
+  };
+
+  Source.list(options).then(sources => res.json(sources)).catch(e => next(e));
+}
