@@ -1,101 +1,91 @@
-export function doPost(args, res, next) {
-  /**
-   * Actions for the post
-   *
-   * id String Post id to view/save/share
-   * action String Post id to view/save/share
-   * returns Post
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
+import httpStatus from 'http-status';
+
+import APIError from '../helper/APIError.js';
+
+import Post from '../models/post.js';
+import Action from '../models/action.js';
+
+async function getPost(req, res, next) {
+  const args = req.swagger.params;
+
+  let id = args.id
+    ? args.id.value
+    : null;
+
+  return await Post.get(id).then((post) => {
+    req.post = post;
+    return post;
+  }).catch(e => next(e));
 }
 
-export function getPosts(args, res, next) {
-  /**
-   * Returns all posts available in the database
-   *
-   * sort String Sort the list of posts by property (optional)
-   * limit Integer Limit number of posts return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
+export async function doPost(req, res, next) {
+  const args = req.swagger.params;
+  let post = await getPost(req, res, next);
+  let action = args.action.value;
+
+  // create action
+  req.action = new Action({type: action, user: req.user._id, entity: post._id, entityType: 'Post'});
+  await req.action.createByUser(req.user).then().catch(e => next(e));
+
+  switch (action) {
+    case 'save':
+      post.meta.numSaved++;
+      break;
+    case 'share':
+      post.meta.numShared++;
+      break;
+    case 'view':
+      post.meta.numViewed++;
+      break;
   }
+
+  await post.extend(post).updateByUser(req.user).then().catch(e => next(e));
+
+  res.json(post.securedInfo());
 }
 
-export function removeActivity(args, res, next) {
-  /**
-   * Remove action for the post
-   *
-   * id String Post id
-   * action String Post id
-   * returns Post
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
+export async function getPosts(req, res, next) {
+  const args = req.swagger.params;
+
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  const query = {};
+
+  if (args.query.value) {
+    query['$or'] = [
+      {
+        title: RegExp(args.query.value, 'i')
+      }
+    ];
   }
+
+  const options = {
+    limit: limit,
+    page: page,
+    sort: sort,
+    query: query
+  };
+
+  Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
 }
 
+export async function removeActivity(req, res, next) {
+  const args = req.swagger.params;
+  let post = await getPost(req, res, next);
+  let action = args.action.value;
+
+  switch (action) {
+    case 'save':
+      post.meta.numSaved--;
+      break;
+  }
+
+  await post.extend(post).updateByUser(req.user).then().catch(e => next(e));
+
+  res.json(post.securedInfo());
+}
