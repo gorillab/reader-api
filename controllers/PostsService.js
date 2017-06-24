@@ -5,6 +5,8 @@ import APIError from '../helper/APIError.js';
 import Post from '../models/post.js';
 import Action from '../models/action.js';
 
+import {isLoggedin} from '../middlewares/auth.js';
+
 async function getPost(req, res, next) {
   const args = req.swagger.params;
 
@@ -19,6 +21,8 @@ async function getPost(req, res, next) {
 }
 
 export async function doPost(req, res, next) {
+  await isLoggedin(req, res, next);
+
   const args = req.swagger.params;
   let post = await getPost(req, res, next);
   let action = args.action.value;
@@ -75,6 +79,8 @@ export async function getPosts(req, res, next) {
 }
 
 export async function removeActivity(req, res, next) {
+  await isLoggedin(req, res, next);
+  
   const args = req.swagger.params;
   let post = await getPost(req, res, next);
   let action = args.action.value;
