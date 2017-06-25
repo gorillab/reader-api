@@ -2,13 +2,12 @@ import passport from 'passport';
 import {Strategy as FacebookStrategy} from 'passport-facebook';
 import mongoose from 'mongoose';
 import User from '../models/user.js';
-import {facebookAuth} from '../config/auth.js';
 
 module.exports = function(app, passport) {
   passport.use(new FacebookStrategy({
-    clientID: facebookAuth.clientID,
-    clientSecret: facebookAuth.clientSecret,
-    callbackURL: facebookAuth.callbackURL
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: process.env.FACEBOOK_CALLBACK
   }, (token, refreshToken, profile, cb) => {
     const options = {
       query: {
