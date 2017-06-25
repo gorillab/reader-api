@@ -16,7 +16,7 @@ export function loginByFacebookCallback(req, res, next) {
     req.logIn(user, err => {
       if (err)
         return new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
-      return res.json(req.user);
+      return res.json(req.user.securedInfo());
     });
   })(req, res, next);
 }
