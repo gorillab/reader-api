@@ -1,10 +1,9 @@
-var _ = require('lodash');
-
 // return promise
-module.exports = function mongooseDocMethodsOverride(schema) {
+export default function mongooseDocMethodsOverride(schema) {
+
   // method create
-  schema.method('createByUser', function(user, cb) {
-    var self = this;
+  schema.method('createByUser', (user, cb) => {
+    let self = this;
 
     // log time
     if (!self.created) {
@@ -18,8 +17,8 @@ module.exports = function mongooseDocMethodsOverride(schema) {
 
     return self.create(cb);
   });
-  schema.method('create', function(cb) {
-    var self = this;
+  schema.method('create', (cb) => {
+    let self = this;
     self.isCreating = true;
 
     // log time
@@ -35,8 +34,8 @@ module.exports = function mongooseDocMethodsOverride(schema) {
     return self.save();
   });
   // method update
-  schema.method('updateByUser', function(user, cb) {
-    var self = this;
+  schema.method('updateByUser', (user, cb) => {
+    let self = this;
 
     // log time
     if (!self.updated) {
@@ -50,8 +49,8 @@ module.exports = function mongooseDocMethodsOverride(schema) {
 
     return self.update(cb);
   });
-  schema.method('update', function(cb) {
-    var self = this;
+  schema.method('update', (cb) => {
+    let self = this;
     self.isUpdating = true;
 
     // log time
@@ -67,8 +66,8 @@ module.exports = function mongooseDocMethodsOverride(schema) {
     return self.save();
   });
   // method delete
-  schema.method('deleteByUser', function(user, cb) {
-    var self = this;
+  schema.method('deleteByUser', (user, cb) => {
+    let self = this;
 
     // log time
     self.isDeleted = true;
@@ -83,8 +82,8 @@ module.exports = function mongooseDocMethodsOverride(schema) {
 
     return self.update(cb);
   });
-  schema.method('delete', function(cb) {
-    var self = this;
+  schema.method('delete', (cb) => {
+    let self = this;
     self.isDeleting = true;
 
     // log time

@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-var passport = require('passport');
+import passport from 'passport';
 
 import APIError from '../helper/APIError.js'
 

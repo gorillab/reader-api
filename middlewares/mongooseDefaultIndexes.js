@@ -1,5 +1,5 @@
 // index accepts single object or objects array
-module.exports = function mongooseDefaultIndexes(schema, index) {
+export default function mongooseDefaultIndexes(schema, index) {
   let indexes = [
     {
       _id: 1,

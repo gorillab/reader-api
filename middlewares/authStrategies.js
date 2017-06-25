@@ -1,5 +1,3 @@
-'use strict';
-
 import passport from 'passport';
 import {Strategy as FacebookStrategy} from 'passport-facebook';
 import mongoose from 'mongoose';
@@ -11,13 +9,13 @@ module.exports = function(app, passport) {
     clientID: facebookAuth.clientID,
     clientSecret: facebookAuth.clientSecret,
     callbackURL: facebookAuth.callbackURL
-  }, function(token, refreshToken, profile, cb) {
+  }, (token, refreshToken, profile, cb) => {
     const options = {
       query: {
         'profile.id': profile.id
       }
     };
-    User.get(options, function(err, user) {
+    User.get(options, (err, user) => {
       if (err)
         return cb(err);
       if (!user) {
@@ -43,7 +41,7 @@ module.exports = function(app, passport) {
           }
         });
 
-        newUser.save(function(err) {
+        newUser.save(err => {
           if (err)
             console.log(err);
           return cb(err, newUser);
@@ -55,13 +53,9 @@ module.exports = function(app, passport) {
 
   }));
 
-  passport.serializeUser(function(user, cb) {
-    cb(null, user._id);
-  });
+  passport.serializeUser((user, cb) => cb(null, user._id));
 
-  passport.deserializeUser(function(id, cb) {
-    User.findOne({_id: id}).then(function(user) {
-      cb(null, user);
-    }).catch(cb);
+  passport.deserializeUser((id, cb) => {
+    User.findOne({_id: id}).then(user => cb(null, user)).catch(cb);
   });
 };

@@ -77,7 +77,20 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-UserSchema.method({});
+UserSchema.method({
+  securedInfo: function() {
+    let obj = this.toObject();
+    obj.id = obj._id;
+    delete obj.isDeleted;
+    delete obj.created;
+    delete obj.updated;
+    delete obj.deleted;
+    delete obj._id;
+    delete obj.token;
+    delete obj.__v;
+    return obj;
+  }
+});
 
 UserSchema.statics = {
   get: function(options, cb) {
