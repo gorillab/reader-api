@@ -1,14 +1,12 @@
-var _ = require('lodash');
-
-module.exports = function mongooseDocExtend(schema) {
+export default function mongooseDocExtend(schema) {
   // extend updates
-  schema.method('extend', function(source) {
-    var self = this;
+  schema.method('extend', source => {
+    let self = this;
 
     // extend doc
-    _.extend(self, source);
+    Object.assign(self, source);
     // mark all doc paths are modified
-    Object.keys(source).forEach(function(path) {
+    Object.keys(source).forEach(path => {
       self.markModified(path);
     });
 

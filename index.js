@@ -15,13 +15,21 @@ import helmet from 'helmet';
 import connectMongo from 'connect-mongo';
 import httpStatus from 'http-status';
 
+// require and configure dotenv, will load vars in .env in PROCESS.ENV
+require('dotenv').config();
+
 import {db} from './config/database.js';
-import {host, port, env} from './config/index.js';
-import {session} from './config/session.js';
+import {host, port, env, session} from './config/index.js';
 import APIError from './helper/APIError.js';
+
+import mongooseDefaultFields from './middlewares/mongooseDefaultFields.js';
+import mongooseDefaultIndexes from './middlewares/mongooseDefaultIndexes.js';
+import mongooseDocExtend from './middlewares/mongooseDocExtend.js';
+import mongooseDocMethodsOverride from './middlewares/mongooseDocMethodsOverride.js';
 
 const app = express();
 const mongoStore = connectMongo(expressSession);
+
 
 // swaggerRouter configuration
 const options = {
@@ -37,10 +45,10 @@ const swaggerDoc = jsyaml.safeLoad(spec);
 mongoose.Promise = require('bluebird');
 
 // mongoose plugins
-mongoose.plugin(require('./middlewares/mongooseDefaultFields.js'));
-mongoose.plugin(require('./middlewares/mongooseDefaultIndexes.js'));
-mongoose.plugin(require('./middlewares/mongooseDocExtend.js'));
-mongoose.plugin(require('./middlewares/mongooseDocMethodsOverride.js'));
+mongoose.plugin(mongooseDefaultFields);
+mongoose.plugin(mongooseDefaultIndexes);
+mongoose.plugin(mongooseDocExtend);
+mongoose.plugin(mongooseDocMethodsOverride);
 
 mongoose.connect(db.mongodb.url);
 mongoose.connection.on('open', () => {
