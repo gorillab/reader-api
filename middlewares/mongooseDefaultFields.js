@@ -1,9 +1,7 @@
 import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
-const _ = require('lodash');
-
 // accepts object
-module.exports = function mongooseDefaultFields(schema, field) {
+export default function mongooseDefaultFields(schema, field) {
 
   let fields = {
     __v: {
@@ -52,18 +50,18 @@ module.exports = function mongooseDefaultFields(schema, field) {
   };
 
   if (field && typeof field === 'object' && !Array.isArray(field)) {
-    _.extend(fields, field);
+    Object.assign(fields, field);
   }
 
   // add fields
   schema.add(fields);
 
-  schema.virtual('id').get(function() {
+  schema.virtual('id').get(() => {
     return this._id.toString();
   });
 
   schema.set('toJSON', {
-    transform: function(doc, ret, options) {
+    transform: (doc, ret, options) => {
       ret.id = ret._id;
       delete ret._id;
     }
