@@ -88,6 +88,7 @@ UserSchema.method({
     delete obj._id;
     delete obj.token;
     delete obj.__v;
+    delete obj.vendor;
     return obj;
   }
 });
