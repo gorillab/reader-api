@@ -14,12 +14,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import connectMongo from 'connect-mongo';
 import httpStatus from 'http-status';
+import { config } from 'dotenv'
 
-// require and configure dotenv, will load vars in .env in PROCESS.ENV
-require('dotenv').config();
-
-import {db} from './config/database.js';
-import {host, port, env, session} from './config/index.js';
 import APIError from './helper/APIError.js';
 
 import mongooseDefaultFields from './middlewares/mongooseDefaultFields.js';
@@ -27,9 +23,9 @@ import mongooseDefaultIndexes from './middlewares/mongooseDefaultIndexes.js';
 import mongooseDocExtend from './middlewares/mongooseDocExtend.js';
 import mongooseDocMethodsOverride from './middlewares/mongooseDocMethodsOverride.js';
 
+config();
 const app = express();
 const mongoStore = connectMongo(expressSession);
-
 
 // swaggerRouter configuration
 const options = {
@@ -37,6 +33,13 @@ const options = {
   controllers: path.join(__dirname, './controllers'),
   useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
 };
+
+const host = process.env.HOST;
+const port = process.env.PORT;
+const env = process.env.NODE_ENV;
+
+const mongoUrl = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?reconnectTries=10&reconnectInterval=3000`
+
 
 // The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
 const spec = fs.readFileSync(path.join(__dirname, 'api/swagger.yaml'), 'utf8');
@@ -50,9 +53,10 @@ mongoose.plugin(mongooseDefaultIndexes);
 mongoose.plugin(mongooseDocExtend);
 mongoose.plugin(mongooseDocMethodsOverride);
 
-mongoose.connect(db.mongodb.url);
+
+mongoose.connect(mongoUrl);
 mongoose.connection.on('open', () => {
-  console.log('--> Mongoose connected:', db.mongodb.url);
+  console.log('--> Mongoose connected:', mongoUrl);
 
   const models = includeAll({
       dirname: path.join(__dirname, './models'),
@@ -78,12 +82,17 @@ mongoose.connection.on('open', () => {
 
     // session
     app.use(expressSession({
-        name: session.name,
-        secret: session.secret,
-        cookie: session.cookie,
-        resave: session.resave,
-        saveUninitialized: session.saveUninitialized,
-        rolling: session.rolling,
+        name: process.env.APP_NAME,
+        secret: process.env.SESSION_SECRET,
+        cookie: {
+            path: '/',
+            httpOnly: true,
+            secure: false,
+            maxAge: 86400000 // 1 hour
+        },
+        resave: false,
+        saveUninitialized: true,
+        rolling: true,
         store: new mongoStore({
             mongooseConnection: mongoose.connection
         })
@@ -150,7 +159,7 @@ mongoose.connection.on('open', () => {
 
 });
 mongoose.connection.on('error', (err) => {
-  console.log('--> Mongoose failed to connect:', db.mongodb.url, err);
+  console.log('--> Mongoose failed to connect:', mongoUrl, err);
   mongoose.disconnect();
 });
 mongoose.connection.on('close', () => {
