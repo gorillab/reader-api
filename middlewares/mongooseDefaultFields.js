@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
+const Schema = Mongoose.Schema;
 // accepts object
 export default function mongooseDefaultFields(schema, field) {
 

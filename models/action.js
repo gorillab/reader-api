@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
+const Schema = Mongoose.Schema;
 
-const ActionSchema = new mongoose.Schema({
+const actionSchema = new Mongoose.Schema({
   type: {
     type: String,
     required: true,
@@ -23,9 +23,9 @@ const ActionSchema = new mongoose.Schema({
   }
 });
 
-ActionSchema.method({});
+actionSchema.method({});
 
-ActionSchema.statics = {
+actionSchema.statics = {
   list: function(options) {
     const query = options.query || {};
     const page = options.page || 0;
@@ -37,4 +37,4 @@ ActionSchema.statics = {
   }
 };
 
-export default mongoose.model('Action', ActionSchema);
+export default Mongoose.model('Action', actionSchema);
