@@ -1,4 +1,4 @@
-import httpStatus from 'http-status';
+import HttpStatus from 'http-status';
 
 import APIError from '../helper/APIError.js';
 

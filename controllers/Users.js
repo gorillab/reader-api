@@ -1,5 +1,3 @@
-import url from 'url';
-
 import * as Users from './UsersService';
 
 export function getSavedPosts(req, res, next) {
