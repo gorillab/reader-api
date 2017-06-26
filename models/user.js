@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
+const Schema = Mongoose.Schema;
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Mongoose.Schema({
   email: {
     type: String,
     match: [
@@ -109,4 +109,4 @@ UserSchema.statics = {
   }
 };
 
-export default mongoose.model('User', UserSchema);
+export default Mongoose.model('User', UserSchema);

@@ -1,6 +1,4 @@
-import passport from 'passport';
 import {Strategy as FacebookStrategy} from 'passport-facebook';
-import mongoose from 'mongoose';
 import User from '../models/user.js';
 
 module.exports = function(app, passport) {

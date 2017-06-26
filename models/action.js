@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
+const Schema = Mongoose.Schema;
 
-const ActionSchema = new mongoose.Schema({
+const ActionSchema = new Mongoose.Schema({
   type: {
     type: String,
     required: true,
@@ -87,4 +87,4 @@ ActionSchema.statics = {
   }
 };
 
-export default mongoose.model('Action', ActionSchema);
+export default Mongoose.model('Action', ActionSchema);
