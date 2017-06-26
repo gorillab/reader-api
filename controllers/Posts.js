@@ -1,5 +1,3 @@
-import url from 'url';
-
 import * as Posts from './PostsService';
 
 export function doPost(req, res, next) {
