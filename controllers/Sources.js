@@ -1,5 +1,3 @@
-import url from 'url';
-
 import * as Sources from './SourcesService';
 
 export function getSources(req, res, next) {

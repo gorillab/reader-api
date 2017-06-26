@@ -1,7 +1,6 @@
-import httpStatus from 'http-status';
+import HttpStatus from 'http-status';
 
 import APIError from '../helper/APIError.js';
-
 import Source from '../models/source.js';
 import Action from '../models/action.js';
 
