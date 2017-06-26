@@ -1,7 +1,7 @@
 import Mongoose from 'mongoose';
 const Schema = Mongoose.Schema;
 
-const PostSchema = new Mongoose.Schema({
+const postSchema = new Mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -86,4 +86,4 @@ const PostSchema = new Mongoose.Schema({
 
 });
 
-export default Mongoose.model('Post', PostSchema);
+export default Mongoose.model('Post', postSchema);

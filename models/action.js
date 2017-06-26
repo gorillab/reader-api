@@ -1,7 +1,7 @@
 import Mongoose from 'mongoose';
 const Schema = Mongoose.Schema;
 
-const ActionSchema = new Mongoose.Schema({
+const actionSchema = new Mongoose.Schema({
   type: {
     type: String,
     required: true,
@@ -61,9 +61,9 @@ const ActionSchema = new Mongoose.Schema({
   }
 });
 
-ActionSchema.method({});
+actionSchema.method({});
 
-ActionSchema.statics = {
+actionSchema.statics = {
   /**
    * Get user
    * @param {ObjectId} id - The objectId of action.
@@ -87,4 +87,4 @@ ActionSchema.statics = {
   }
 };
 
-export default Mongoose.model('Action', ActionSchema);
+export default Mongoose.model('Action', actionSchema);
