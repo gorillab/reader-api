@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
+const Schema = Mongoose.Schema;
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new Mongoose.Schema({
   email: {
     type: String,
     match: [
@@ -77,7 +77,7 @@ const UserSchema = new mongoose.Schema({
   }
 });
 
-UserSchema.method({
+userSchema.method({
   securedInfo: function() {
     let obj = this.toObject();
     obj.id = obj._id;
@@ -93,7 +93,7 @@ UserSchema.method({
   }
 });
 
-UserSchema.statics = {
+userSchema.statics = {
   get: function(options, cb) {
     options.select = options.select || 'email source profile';
     return this.findOne(options.query).select(options.select).exec(cb);
@@ -109,4 +109,4 @@ UserSchema.statics = {
   }
 };
 
-export default mongoose.model('User', UserSchema);
+export default Mongoose.model('User', userSchema);

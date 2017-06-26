@@ -1,4 +1,4 @@
-import httpStatus from 'http-status';
+import HttpStatus from 'http-status';
 
 import APIError from '../helper/APIError.js';
 
@@ -80,7 +80,7 @@ export async function getPosts(req, res, next) {
 
 export async function removeActivity(req, res, next) {
   await isLoggedin(req, res, next);
-  
+
   const args = req.swagger.params;
   let post = await getPost(req, res, next);
   let action = args.action.value;

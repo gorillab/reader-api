@@ -1,11 +1,11 @@
 import Promise from 'bluebird';
-import mongoose from 'mongoose';
-import httpStatus from 'http-status';
+import Mongoose from 'mongoose';
+import HttpStatus from 'http-status';
 import APIError from '../helper/APIError.js';
 
-const Schema = mongoose.Schema;
+const Schema = Mongoose.Schema;
 
-const SourceSchema = new mongoose.Schema({
+const sourceSchema = new Mongoose.Schema({
   title: {
     type: String,
     require: true,
@@ -18,7 +18,7 @@ const SourceSchema = new mongoose.Schema({
   }
 });
 
-SourceSchema.method({
+sourceSchema.method({
   securedInfo: function() {
     var obj = this.toObject();
     obj.id = obj._id;
@@ -31,13 +31,13 @@ SourceSchema.method({
   }
 });
 
-SourceSchema.statics = {
+sourceSchema.statics = {
   get(id) {
     return this.findById(id).exec().then((source) => {
       if (source) {
         return source;
       }
-      const err = new APIError('No such source exists!', httpStatus.NOT_FOUND, true);
+      const err = new APIError('No such source exists!', HttpStatus.NOT_FOUND, true);
       return Promise.reject(err);
     });
   },
@@ -52,4 +52,4 @@ SourceSchema.statics = {
   }
 };
 
-export default mongoose.model('Source', SourceSchema);
+export default Mongoose.model('Source', sourceSchema);

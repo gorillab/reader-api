@@ -1,4 +1,4 @@
-import url from 'url';
+import Url from 'url';
 
 import * as Auth from './AuthService';
 

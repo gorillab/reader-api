@@ -1,11 +1,11 @@
 import Promise from 'bluebird';
-import mongoose from 'mongoose';
-import httpStatus from 'http-status';
+import Mongoose from 'mongoose';
+import HttpStatus from 'http-status';
 import APIError from '../helper/APIError.js';
 
-const Schema = mongoose.Schema;
+const Schema = Mongoose.Schema;
 
-const PostSchema = new mongoose.Schema({
+const postSchema = new Mongoose.Schema({
   title: {
     type: String,
     required: true,
@@ -51,7 +51,7 @@ const PostSchema = new mongoose.Schema({
   }
 });
 
-PostSchema.method({
+postSchema.method({
   securedInfo: function() {
     var obj = this.toObject();
     obj.id = obj._id;
@@ -64,13 +64,13 @@ PostSchema.method({
   }
 });
 
-PostSchema.statics = {
+postSchema.statics = {
   get(id) {
     return this.findById(id).exec().then((source) => {
       if (source) {
         return source;
       }
-      const err = new APIError('No such post exists!', httpStatus.NOT_FOUND, true);
+      const err = new APIError('No such post exists!', HttpStatus.NOT_FOUND, true);
       return Promise.reject(err);
     });
   },
@@ -85,4 +85,4 @@ PostSchema.statics = {
   }
 };
 
-export default mongoose.model('Post', PostSchema);
+export default Mongoose.model('Post', postSchema);
