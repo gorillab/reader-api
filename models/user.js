@@ -1,85 +1,87 @@
 import Mongoose from 'mongoose';
+
 const Schema = Mongoose.Schema;
 
 const userSchema = new Mongoose.Schema({
   email: {
     type: String,
     match: [
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please enter a valid email'
+      // eslint-disable-next-line
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please enter a valid email',
     ],
     trim: true,
-    lowercase: true
+    lowercase: true,
   },
   token: {
     type: String,
     trim: true,
-    required: true
+    required: true,
   },
   vendor: {
     type: String,
-    trim: true
+    trim: true,
   },
   sources: [
     {
       type: Schema.ObjectId,
-      ref: 'Source'
-    }
+      ref: 'Source',
+    },
   ],
   profile: {
     id: {
       type: String,
-      trim: true
+      trim: true,
     },
     username: {
       type: String,
-      trim: true
+      trim: true,
     },
     displayName: {
       type: String,
-      trim: true
+      trim: true,
     },
     name: {
       familyName: {
         type: String,
-        trim: true
+        trim: true,
       },
       givenName: {
         type: String,
-        trim: true
+        trim: true,
       },
       middleName: {
         type: String,
-        trim: true
-      }
+        trim: true,
+      },
     },
     gender: {
       type: String,
       trim: true,
-      enum: ['male', 'female']
+      enum: ['male', 'female'],
     },
     profileUrl: {
       type: String,
-      trim: true
+      trim: true,
     },
     emails: [
       {
         type: String,
         lowercase: true,
-        trim: true
-      }
+        trim: true,
+      },
     ],
     photos: [
       {
         type: String,
-        trim: true
-      }
-    ]
-  }
+        trim: true,
+      },
+    ],
+  },
 });
 
 userSchema.method({
-  securedInfo: function() {
-    let obj = this.toObject();
+  securedInfo() {
+    const obj = this.toObject();
     obj.id = obj._id;
     delete obj.isDeleted;
     delete obj.created;
@@ -90,23 +92,25 @@ userSchema.method({
     delete obj.__v;
     delete obj.vendor;
     return obj;
-  }
+  },
 });
 
 userSchema.statics = {
-  get: function(options, cb) {
+  get(options, cb) {
     options.select = options.select || 'email source profile';
     return this.findOne(options.query).select(options.select).exec(cb);
   },
-  list: function(options) {
+  list(options) {
     const query = options.query || {};
     const page = options.page || 0;
     const sort = options.sort || '-created.at';
     const limit = options.limit || 0;
     const select = options.select || '';
 
-    return this.find(query).sort(sort).select(select).limit(limit).skip(limit * page).exec();
-  }
+    return this.find(query).sort(sort).select(select).limit(limit)
+    .skip(limit * page)
+    .exec();
+  },
 };
 
 export default Mongoose.model('User', userSchema);
