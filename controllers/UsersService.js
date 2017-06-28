@@ -1,13 +1,8 @@
-import HttpStatus from 'http-status';
+import Post from '../models/post';
+import Source from '../models/source';
+import Action from '../models/action';
 
-import APIError from '../helper/APIError.js';
-
-import User from '../models/user.js';
-import Post from '../models/post.js';
-import Source from '../models/source.js';
-import Action from '../models/action.js';
-
-import {isLoggedin} from '../middlewares/auth.js';
+import { isLoggedin } from '../middlewares/auth';
 
 export async function getSavedPosts(req, res, next) {
   await isLoggedin(req, res, next);
@@ -16,19 +11,17 @@ export async function getSavedPosts(req, res, next) {
   let query = {
     type: 'save',
     entityType: 'Post',
-    user: req.user._id
+    user: req.user._id,
   };
 
   let options = {
     select: 'entity',
-    query: query
+    query,
   };
 
-  let postIds = await Action.list(options).then(actions => {
-    return actions.map(action => {
-      return action.entity.toString();
-    });
-  }).catch(e => next(e));
+  const postIds = await Action.list(options)
+  .then(actions => actions.map(action => action.entity.toString()))
+  .catch(e => next(e));
 
   // get posts
   const limit = args.limit.value || 25;
@@ -41,25 +34,23 @@ export async function getSavedPosts(req, res, next) {
   query = {
     isDeleted: false,
     _id: {
-      $in: postIds
-    }
+      $in: postIds,
+    },
   };
 
-  console.log(query);
-
   if (args.query.value) {
-    query['$or'] = [
+    query.$or = [
       {
-        title: RegExp(args.query.value, 'i')
-      }
+        title: RegExp(args.query.value, 'i'),
+      },
     ];
   }
 
   options = {
-    limit: limit,
-    page: page,
-    sort: sort,
-    query: query
+    limit,
+    page,
+    sort,
+    query,
   };
 
   Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
@@ -70,9 +61,7 @@ export async function getSubscriptions(req, res, next) {
 
   const args = req.swagger.params;
 
-  let sourceIds = req.user.sources.map(sourceId => {
-    return sourceId.toString();
-  });
+  const sourceIds = req.user.sources.map(sourceId => sourceId.toString());
 
   const limit = args.limit.value || 25;
   const page = args.page.value
@@ -84,23 +73,23 @@ export async function getSubscriptions(req, res, next) {
   const query = {
     isDeleted: false,
     _id: {
-      $in: sourceIds
-    }
+      $in: sourceIds,
+    },
   };
 
   if (args.query.value) {
-    query['$or'] = [
+    query.$or = [
       {
-        title: RegExp(args.query.value, 'i')
-      }
+        title: RegExp(args.query.value, 'i'),
+      },
     ];
   }
 
   const options = {
-    limit: limit,
-    page: page,
-    sort: sort,
-    query: query
+    limit,
+    page,
+    sort,
+    query,
   };
 
   Source.list(options).then(sources => res.json(sources)).catch(e => next(e));
