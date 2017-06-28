@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import Mongoose from 'mongoose';
 import HttpStatus from 'http-status';
-import APIError from '../helper/APIError.js';
+import APIError from '../helper/APIError';
 
 const Schema = Mongoose.Schema;
 
@@ -9,51 +9,51 @@ const postSchema = new Mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   content: {
     type: String,
-    trim: true
+    trim: true,
   },
   image: {
     type: String,
-    trim: true
+    trim: true,
   },
   url: {
     type: String,
     trim: true,
-    required: true
+    required: true,
   },
   timestamp: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   source: {
     type: Schema.ObjectId,
-    ref: 'Source'
+    ref: 'Source',
   },
   meta: {
     numViewed: {
       type: Number,
       min: 0,
-      default: 0
+      default: 0,
     },
     numSaved: {
       type: Number,
       min: 0,
-      default: 0
+      default: 0,
     },
     numShared: {
       type: Number,
       min: 0,
-      default: 0
-    }
-  }
+      default: 0,
+    },
+  },
 });
 
 postSchema.method({
-  securedInfo: function() {
-    var obj = this.toObject();
+  securedInfo() {
+    const obj = this.toObject();
     obj.id = obj._id;
     delete obj.isDeleted;
     delete obj.created;
@@ -61,7 +61,7 @@ postSchema.method({
     delete obj.deleted;
     delete obj._id;
     return obj;
-  }
+  },
 });
 
 postSchema.statics = {
@@ -74,15 +74,17 @@ postSchema.statics = {
       return Promise.reject(err);
     });
   },
-  list: function(options) {
+  list(options) {
     const query = options.query || {};
     const page = options.page || 0;
     const sort = options.sort || 'title';
     const limit = options.limit || 0;
     const select = options.select || 'id title content image url source meta';
 
-    return this.find(query).sort(sort).select(select).limit(limit).skip(limit * page).exec();
-  }
+    return this.find(query).sort(sort).select(select).limit(limit)
+    .skip(limit * page)
+    .exec();
+  },
 };
 
 export default Mongoose.model('Post', postSchema);
