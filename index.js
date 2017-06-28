@@ -132,7 +132,8 @@ Mongoose.connection.on('open', () => {
       return next(err);
     });
 
-    app.use((err, req, res) => {
+    // eslint-disable-next-line
+    app.use((err, req, res, next) => {
       const errorResponse = {
         message: err.isPublic
           ? err.message
