@@ -1,52 +1,52 @@
 import Mongoose from 'mongoose';
+
 const Schema = Mongoose.Schema;
 // accepts object
 export default function mongooseDefaultFields(schema, field) {
-
-  let fields = {
+  const fields = {
     __v: {
       type: Number,
-      select: false
+      select: false,
     },
     isDeleted: {
       type: Boolean,
       default: false,
-      select: false
+      select: false,
     },
     created: {
       at: {
         type: Date,
         default: Date.now,
-        select: false
+        select: false,
       },
       by: {
         type: Schema.ObjectId,
         ref: 'User',
-        select: false
-      }
+        select: false,
+      },
     },
     updated: {
       at: {
         type: Date,
-        select: false
+        select: false,
       },
       by: {
         type: Schema.ObjectId,
         ref: 'User',
-        select: false
-      }
+        select: false,
+      },
     },
     deleted: {
       at: {
         type: Date,
-        select: false
+        select: false,
       },
       by: {
         type: Schema.ObjectId,
         ref: 'User',
-        select: false
-      }
-    }
+        select: false,
+      },
+    },
   };
 
   if (field && typeof field === 'object' && !Array.isArray(field)) {
@@ -56,14 +56,14 @@ export default function mongooseDefaultFields(schema, field) {
   // add fields
   schema.add(fields);
 
-  schema.virtual('id').get(() => {
-    return this._id.toString();
+  schema.virtual('id').get(function () {
+    this._id.toString();
   });
 
   schema.set('toJSON', {
-    transform: (doc, ret, options) => {
+    transform: (doc, ret) => {
       ret.id = ret._id;
       delete ret._id;
-    }
+    },
   });
-};
+}

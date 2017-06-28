@@ -1,20 +1,16 @@
-import HttpStatus from 'http-status';
+import Post from '../models/post';
+import Action from '../models/action';
 
-import APIError from '../helper/APIError.js';
-
-import Post from '../models/post.js';
-import Action from '../models/action.js';
-
-import {isLoggedin} from '../middlewares/auth.js';
+import { isLoggedin } from '../middlewares/auth';
 
 async function getPost(req, res, next) {
   const args = req.swagger.params;
 
-  let id = args.id
+  const id = args.id
     ? args.id.value
     : null;
 
-  return await Post.get(id).then((post) => {
+  await Post.get(id).then((post) => {
     req.post = post;
     return post;
   }).catch(e => next(e));
@@ -24,22 +20,26 @@ export async function doPost(req, res, next) {
   await isLoggedin(req, res, next);
 
   const args = req.swagger.params;
-  let post = await getPost(req, res, next);
-  let action = args.action.value;
+  await getPost(req, res, next);
+  const post = req.post;
+  const action = args.action.value;
 
   // create action
-  req.action = new Action({type: action, user: req.user._id, entity: post._id, entityType: 'Post'});
+  req.action = new Action({ type: action, user: req.user._id, entity: post._id, entityType: 'Post' });
   await req.action.createByUser(req.user).then().catch(e => next(e));
 
   switch (action) {
     case 'save':
-      post.meta.numSaved++;
+      post.meta.numSaved += 1;
       break;
     case 'share':
-      post.meta.numShared++;
+      post.meta.numShared += 1;
       break;
     case 'view':
-      post.meta.numViewed++;
+      post.meta.numViewed += 1;
+      break;
+    default:
+      post.meta.numViewed += 1;
       break;
   }
 
@@ -61,18 +61,18 @@ export async function getPosts(req, res, next) {
   const query = {};
 
   if (args.query.value) {
-    query['$or'] = [
+    query.$or = [
       {
-        title: RegExp(args.query.value, 'i')
-      }
+        title: RegExp(args.query.value, 'i'),
+      },
     ];
   }
 
   const options = {
-    limit: limit,
-    page: page,
-    sort: sort,
-    query: query
+    limit,
+    page,
+    sort,
+    query,
   };
 
   Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
@@ -82,13 +82,12 @@ export async function removeActivity(req, res, next) {
   await isLoggedin(req, res, next);
 
   const args = req.swagger.params;
-  let post = await getPost(req, res, next);
-  let action = args.action.value;
+  await getPost(req, res, next);
+  const post = req.post;
+  const action = args.action.value;
 
-  switch (action) {
-    case 'save':
-      post.meta.numSaved--;
-      break;
+  if (action === 'save') {
+    post.meta.numSaved -= 1;
   }
 
   await post.extend(post).updateByUser(req.user).then().catch(e => next(e));

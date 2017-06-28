@@ -1,26 +1,25 @@
-import {Strategy as FacebookStrategy} from 'passport-facebook';
-import User from '../models/user.js';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
+import User from '../models/user';
 
-module.exports = function(app, passport) {
+module.exports = (app, passport) => {
   passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: process.env.FACEBOOK_CALLBACK
+    callbackURL: process.env.FACEBOOK_CALLBACK,
   }, (token, refreshToken, profile, cb) => {
     const options = {
       query: {
-        'profile.id': profile.id
-      }
+        'profile.id': profile.id,
+      },
     };
     User.get(options, (err, user) => {
-      if (err)
-        return cb(err);
+      if (err) { return cb(err); }
       if (!user) {
-        let newUser = new User({
+        const newUser = new User({
           email: profile.emails
             ? profile.emails[0].value
             : null,
-          token: token,
+          token,
           vendor: 'facebook',
           profile: {
             id: profile.id,
@@ -29,30 +28,28 @@ module.exports = function(app, passport) {
             name: {
               familyName: profile.name.familyName,
               givenName: profile.name.givenName,
-              middleName: profile.name.middleName
+              middleName: profile.name.middleName,
             },
             gender: profile.gender,
             profileUrl: profile.profileUrl,
             emails: profile.emails,
-            photos: profile.photos
-          }
+            photos: profile.photos,
+          },
         });
 
-        newUser.save(err => {
-          if (err)
-            console.log(err);
+        return newUser.save((error) => {
+          if (error) { return cb(error); }
           return cb(err, newUser);
         });
-      } else {
-        return cb(err, user);
       }
-    });
 
+      return cb(err, user);
+    });
   }));
 
   passport.serializeUser((user, cb) => cb(null, user._id));
 
   passport.deserializeUser((id, cb) => {
-    User.findOne({_id: id}).then(user => cb(null, user)).catch(cb);
+    User.findOne({ _id: id }).then(user => cb(null, user)).catch(cb);
   });
 };

@@ -16,7 +16,7 @@ cache:
     - node_modules
 
 script:
-  - npm build
+  - npm run build
 
 notifications:
   email: false
