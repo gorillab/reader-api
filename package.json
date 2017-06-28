@@ -22,6 +22,7 @@
     "serve": "node dist/index.js"
   },
   "dependencies": {
+    "bluebird": "^3.5.0",
     "body-parser": "^1.17.2",
     "connect-mongo": "^1.3.2",
     "cookie-parser": "^1.4.3",
@@ -46,6 +47,26 @@
     "babel-core": "^6.25.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
+    "eslint": "3.19.0",
+    "eslint-config-airbnb": "15.0.1",
+    "eslint-plugin-import": "2.2.0",
+    "eslint-plugin-jsx-a11y": "5.0.1",
+    "eslint-plugin-react": "7.1.0",
     "nodemon": "^1.11.0"
+  },
+  "eslintConfig": {
+    "extends": "airbnb",
+    "rules": {
+      "no-underscore-dangle": [2, {
+        "allow": ["_id", "__v"]
+      }],
+      "no-param-reassign": [
+        2,
+        {
+          "props": false
+        }
+      ],
+      "func-names": ["error", "never"]
+    }
   }
 }

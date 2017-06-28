@@ -1,14 +1,13 @@
 // return promise
 export default function mongooseDocMethodsOverride(schema) {
-
   // method create
-  schema.method('createByUser', (user, cb) => {
-    let self = this;
+  schema.method('createByUser', function (user, cb) {
+    const self = this;
 
     // log time
     if (!self.created) {
       self.created = {
-        at: new Date()
+        at: new Date(),
       };
     }
     if (user) {
@@ -17,14 +16,14 @@ export default function mongooseDocMethodsOverride(schema) {
 
     return self.create(cb);
   });
-  schema.method('create', (cb) => {
-    let self = this;
+  schema.method('create', function (cb) {
+    const self = this;
     self.isCreating = true;
 
     // log time
     if (!self.created) {
       self.created = {
-        at: new Date()
+        at: new Date(),
       };
     }
 
@@ -34,13 +33,13 @@ export default function mongooseDocMethodsOverride(schema) {
     return self.save();
   });
   // method update
-  schema.method('updateByUser', (user, cb) => {
-    let self = this;
+  schema.method('updateByUser', function (user, cb) {
+    const self = this;
 
     // log time
     if (!self.updated) {
       self.updated = {
-        at: new Date()
+        at: new Date(),
       };
     }
     if (user) {
@@ -49,14 +48,14 @@ export default function mongooseDocMethodsOverride(schema) {
 
     return self.update(cb);
   });
-  schema.method('update', (cb) => {
-    let self = this;
+  schema.method('update', function (cb) {
+    const self = this;
     self.isUpdating = true;
 
     // log time
     if (!self.updated) {
       self.updated = {
-        at: new Date()
+        at: new Date(),
       };
     }
 
@@ -66,14 +65,14 @@ export default function mongooseDocMethodsOverride(schema) {
     return self.save();
   });
   // method delete
-  schema.method('deleteByUser', (user, cb) => {
-    let self = this;
+  schema.method('deleteByUser', function (user, cb) {
+    const self = this;
 
     // log time
     self.isDeleted = true;
     if (!self.deleted) {
       self.deleted = {
-        at: new Date()
+        at: new Date(),
       };
     }
     if (user) {
@@ -82,15 +81,15 @@ export default function mongooseDocMethodsOverride(schema) {
 
     return self.update(cb);
   });
-  schema.method('delete', (cb) => {
-    let self = this;
+  schema.method('delete', function (cb) {
+    const self = this;
     self.isDeleting = true;
 
     // log time
     self.isDeleted = true;
     if (!self.deleted) {
       self.deleted = {
-        at: new Date()
+        at: new Date(),
       };
     }
 
@@ -99,4 +98,4 @@ export default function mongooseDocMethodsOverride(schema) {
     }
     return self.save();
   });
-};
+}
