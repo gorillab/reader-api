@@ -56,7 +56,9 @@ export default function mongooseDefaultFields(schema, field) {
   // add fields
   schema.add(fields);
 
-  schema.virtual('id').get(() => this._id.toString());
+  schema.virtual('id').get(function () {
+    this._id.toString();
+  });
 
   schema.set('toJSON', {
     transform: (doc, ret) => {

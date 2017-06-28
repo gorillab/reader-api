@@ -1,6 +1,6 @@
 export default function mongooseDocExtend(schema) {
   // extend updates
-  schema.method('extend', (source) => {
+  schema.method('extend', function (source) {
     const self = this;
 
     // extend doc
