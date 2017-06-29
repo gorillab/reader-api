@@ -1,3 +1,4 @@
+/* eslint-disable */
 import url from 'url';
 
 import * as Users from './UsersService';

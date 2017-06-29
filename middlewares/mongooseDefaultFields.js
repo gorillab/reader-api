@@ -1,13 +1,9 @@
 import Mongoose from 'mongoose';
 
 const Schema = Mongoose.Schema;
-// accepts object
-export default function mongooseDefaultFields(schema, field) {
+
+const mongooseDefaultFields = (schema, field) => {
   const fields = {
-    __v: {
-      type: Number,
-      select: false,
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -47,13 +43,16 @@ export default function mongooseDefaultFields(schema, field) {
         select: false,
       },
     },
+    __v: {
+      type: Number,
+      select: false,
+    },
   };
 
   if (field && typeof field === 'object' && !Array.isArray(field)) {
     Object.assign(fields, field);
   }
 
-  // add fields
   schema.add(fields);
 
   schema.virtual('id').get(function () {
@@ -66,4 +65,6 @@ export default function mongooseDefaultFields(schema, field) {
       delete ret._id;
     },
   });
-}
+};
+
+export default mongooseDefaultFields;

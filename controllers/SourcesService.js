@@ -71,7 +71,8 @@ export async function subscribe(req, res, next) {
 export async function unsubscribe(req, res, next) {
   await isLoggedin(req, res, next);
 
-  const source = await getSource(req, res, next);
+  await getSource(req, res, next);
+  const source = req.source;
 
   // create action
   const action = new Action({ type: 'unsubscribe', user: req.user._id, entity: source._id, entityType: 'Source' });
