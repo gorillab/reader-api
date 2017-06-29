@@ -7,7 +7,10 @@ module.exports = (app, passport) => {
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
     callbackURL: process.env.FACEBOOK_CALLBACK,
   }, (
-    token, refreshToken, { id, username, displayName, name, gender, profileUrl, emails, photos }, cb
+    token,
+    refreshToken,
+    { id, username, displayName, name, gender, profileUrl, emails, photos },
+    cb,
   ) => {
     const options = {
       query: {
