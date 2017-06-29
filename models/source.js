@@ -1,7 +1,7 @@
-import Mongoose from 'mongoose';
-const Schema = Mongoose.Schema;
+import mongoose from 'mongoose';
+const Schema = mongoose.Schema;
 
-const sourceSchema = new Mongoose.Schema({
+const SourceSchema = new mongoose.Schema({
   title: {
     type: String,
     require: true,
@@ -52,4 +52,4 @@ const sourceSchema = new Mongoose.Schema({
   }
 });
 
-export default Mongoose.model('Source', sourceSchema);
+export default mongoose.model('Source', SourceSchema);
