@@ -10,11 +10,15 @@ export function loginByFacebook(req, res, next) {
 export function loginByFacebookCallback(req, res, next) {
   Passport.authenticate('facebook', {
     failureFlash: false,
-  }, (err, user) => {
-    if (err) { return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true); }
+  }, (err1, user) => {
+    if (err1) {
+      return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true);
+    }
 
-    return req.logIn(user, (error) => {
-      if (error) { return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true); }
+    return req.logIn(user, (err2) => {
+      if (err2) {
+        return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true);
+      }
 
       return res.json(req.user.securedInfo());
     });
@@ -23,5 +27,7 @@ export function loginByFacebookCallback(req, res, next) {
 
 export function logout(req, res) {
   req.logout();
-  res.json({ message: 'Done' });
+  res.json({
+    message: 'Done',
+  });
 }

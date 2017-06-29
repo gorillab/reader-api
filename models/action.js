@@ -24,7 +24,6 @@ const actionSchema = new Mongoose.Schema({
   },
 });
 
-actionSchema.method({});
 
 actionSchema.statics = {
   list(options) {
@@ -34,7 +33,10 @@ actionSchema.statics = {
     const limit = options.limit || 0;
     const select = options.select || '';
 
-    return this.find(query).sort(sort).select(select).limit(limit)
+    return this.find(query)
+    .sort(sort)
+    .select(select)
+    .limit(limit)
     .skip(limit * page)
     .exec();
   },

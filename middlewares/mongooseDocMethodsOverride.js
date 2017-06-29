@@ -1,101 +1,76 @@
 // return promise
-export default function mongooseDocMethodsOverride(schema) {
+const mongooseDocMethodsOverride = (schema) => {
   // method create
-  schema.method('createByUser', function (user, cb) {
-    const self = this;
-
-    // log time
-    if (!self.created) {
-      self.created = {
+  schema.method('createByUser', function (user = undefined, cb) {
+    if (!this.created) {
+      this.created = {
         at: new Date(),
       };
     }
-    if (user) {
-      self.created.by = user;
-    }
+    this.created.by = user;
 
-    return self.create(cb);
+    return this.create(cb);
   });
   schema.method('create', function (cb) {
-    const self = this;
-    self.isCreating = true;
+    this.isCreating = true;
 
-    // log time
-    if (!self.created) {
-      self.created = {
+    if (!this.created) {
+      this.created = {
         at: new Date(),
       };
     }
 
-    if (cb && typeof cb === 'function') {
-      return self.save(cb);
-    }
-    return self.save();
+    return this.save(cb);
   });
-  // method update
-  schema.method('updateByUser', function (user, cb) {
-    const self = this;
 
-    // log time
-    if (!self.updated) {
-      self.updated = {
+  // method update
+  schema.method('updateByUser', function (user = undefined, cb) {
+    if (!this.updated) {
+      this.updated = {
         at: new Date(),
       };
     }
-    if (user) {
-      self.updated.by = user;
-    }
+    this.updated.by = user;
 
-    return self.update(cb);
+    return this.update(cb);
   });
   schema.method('update', function (cb) {
-    const self = this;
-    self.isUpdating = true;
+    this.isUpdating = true;
 
-    // log time
-    if (!self.updated) {
-      self.updated = {
+    if (!this.updated) {
+      this.updated = {
         at: new Date(),
       };
     }
 
-    if (cb && typeof cb === 'function') {
-      return self.save(cb);
-    }
-    return self.save();
+    return this.save(cb);
   });
-  // method delete
-  schema.method('deleteByUser', function (user, cb) {
-    const self = this;
 
-    // log time
-    self.isDeleted = true;
-    if (!self.deleted) {
-      self.deleted = {
+  // method delete
+  schema.method('deleteByUser', function (user = undefined, cb) {
+    this.isDeleted = true;
+
+    if (!this.deleted) {
+      this.deleted = {
         at: new Date(),
       };
     }
-    if (user) {
-      self.deleted.by = user;
-    }
+    this.user = user;
 
-    return self.update(cb);
+    return this.update(cb);
   });
   schema.method('delete', function (cb) {
-    const self = this;
-    self.isDeleting = true;
+    this.isDeleting = true;
 
-    // log time
-    self.isDeleted = true;
-    if (!self.deleted) {
-      self.deleted = {
+    this.isDeleted = true;
+    if (!this.deleted) {
+      this.deleted = {
         at: new Date(),
       };
     }
 
-    if (cb && typeof cb === 'function') {
-      return self.save(cb);
-    }
-    return self.save();
+    return this.save(cb);
   });
-}
+};
+
+export default mongooseDocMethodsOverride;

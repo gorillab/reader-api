@@ -81,34 +81,29 @@ const userSchema = new Mongoose.Schema({
 
 userSchema.method({
   securedInfo() {
-    const obj = this.toObject();
-    obj.id = obj._id;
-    delete obj.isDeleted;
-    delete obj.created;
-    delete obj.updated;
-    delete obj.deleted;
-    delete obj._id;
-    delete obj.token;
-    delete obj.__v;
-    delete obj.vendor;
-    return obj;
+    const { _id, email, sources, profile } = this;
+
+    return {
+      id: _id,
+      email,
+      sources,
+      profile,
+    };
   },
 });
 
 userSchema.statics = {
-  get(options, cb) {
-    options.select = options.select || 'email source profile';
-    return this.findOne(options.query).select(options.select).exec(cb);
+  get({ select, query }, cb) {
+    return this.findOne(query)
+    .select(select || 'email sources profile')
+    .exec(cb);
   },
-  list(options) {
-    const query = options.query || {};
-    const page = options.page || 0;
-    const sort = options.sort || '-created.at';
-    const limit = options.limit || 0;
-    const select = options.select || '';
-
-    return this.find(query).sort(sort).select(select).limit(limit)
-    .skip(limit * page)
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || '-created.at')
+    .select(select || 'email sources profile')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
     .exec();
   },
 };
