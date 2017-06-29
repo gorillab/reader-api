@@ -20,7 +20,7 @@
     "lint": "eslint .",
     "start": "nodemon index.js --exec eslint . && babel-node",
     "prebuild": "eslint .",
-    "build": "babel . --out-dir dist --copy-files --ignore ode_modules,dist --minified",
+    "build": "babel . --out-dir dist --copy-files --ignore node_modules,dist --minified",
     "serve": "node dist/index.js"
   },
   "dependencies": {

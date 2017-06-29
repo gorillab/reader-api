@@ -1,7 +1,7 @@
 // return promise
 const mongooseDocMethodsOverride = (schema) => {
   // method create
-  schema.method('createByUser', (user = undefined, cb) => {
+  schema.method('createByUser', function (user = undefined, cb) {
     if (!this.created) {
       this.created = {
         at: new Date(),
@@ -11,7 +11,7 @@ const mongooseDocMethodsOverride = (schema) => {
 
     return this.create(cb);
   });
-  schema.method('create', (cb = () => {}) => {
+  schema.method('create', function (cb) {
     this.isCreating = true;
 
     if (!this.created) {
@@ -24,7 +24,7 @@ const mongooseDocMethodsOverride = (schema) => {
   });
 
   // method update
-  schema.method('updateByUser', (user = undefined, cb) => {
+  schema.method('updateByUser', function (user = undefined, cb) {
     if (!this.updated) {
       this.updated = {
         at: new Date(),
@@ -34,7 +34,7 @@ const mongooseDocMethodsOverride = (schema) => {
 
     return this.update(cb);
   });
-  schema.method('update', (cb = () => {}) => {
+  schema.method('update', function (cb) {
     this.isUpdating = true;
 
     if (!this.updated) {
@@ -47,7 +47,7 @@ const mongooseDocMethodsOverride = (schema) => {
   });
 
   // method delete
-  schema.method('deleteByUser', (user = undefined, cb) => {
+  schema.method('deleteByUser', function (user = undefined, cb) {
     this.isDeleted = true;
 
     if (!this.deleted) {
@@ -59,7 +59,7 @@ const mongooseDocMethodsOverride = (schema) => {
 
     return this.update(cb);
   });
-  schema.method('delete', (cb = () => {}) => {
+  schema.method('delete', function (cb) {
     this.isDeleting = true;
 
     this.isDeleted = true;
