@@ -1,15 +1,11 @@
-export default function mongooseDocExtend(schema) {
-  // extend updates
-  schema.method('extend', function (source) {
-    const self = this;
+// extend updates
+const mongooseDocExtend = (schema) => {
+  schema.method('extend', (source) => {
+    Object.assign(this, source);
+    Object.keys(source).forEach(this.markModified);
 
-    // extend doc
-    Object.assign(self, source);
-    // mark all doc paths are modified
-    Object.keys(source).forEach((path) => {
-      self.markModified(path);
-    });
-
-    return self;
+    return this;
   });
-}
+};
+
+export default mongooseDocExtend;
