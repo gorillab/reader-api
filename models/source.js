@@ -1,7 +1,8 @@
-import Promise from 'bluebird';
 import Mongoose from 'mongoose';
+import Promise from 'bluebird';
 import HttpStatus from 'http-status';
 import APIError from '../helper/APIError';
+
 
 const sourceSchema = new Mongoose.Schema({
   title: {
@@ -46,7 +47,10 @@ sourceSchema.statics = {
     const limit = options.limit || 0;
     const select = options.select || 'id title';
 
-    return this.find(query).sort(sort).select(select).limit(limit)
+    return this.find(query)
+    .sort(sort)
+    .select(select)
+    .limit(limit)
     .skip(limit * page)
     .exec();
   },
