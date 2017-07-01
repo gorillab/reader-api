@@ -1,6 +1,6 @@
 import Mongoose from 'mongoose';
 import HttpStatus from 'http-status';
-import APIError from '../helper/APIError';
+import APIError from '../helpers/APIError';
 
 
 const sourceSchema = new Mongoose.Schema({

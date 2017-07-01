@@ -1,18 +1,19 @@
 import Source from '../models/source';
 import Action from '../models/action';
 
-import isLoggedin from '../middlewares/auth';
-
-const getSource = async (req, res, next) => {
+export const getSource = async (req, res, next) => {
   const args = req.swagger.params;
 
   const id = args.id
     ? args.id.value
     : null;
 
-  await Source.get(id).then((source) => {
-    req.source = source;
-  }).catch(e => next(e));
+  try {
+    req.source = await Source.get(id);
+    next();
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const getSources = async (req, res, next) => {
@@ -35,59 +36,74 @@ export const getSources = async (req, res, next) => {
     ];
   }
 
-  const options = {
-    limit,
-    page,
-    sort,
-    query,
-  };
+  try {
+    const sources = await Source.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
 
-  Source.list(options).then(sources => res.json(sources)).catch(e => next(e));
+    res.json(sources);
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const subscribe = async (req, res, next) => {
-  await isLoggedin(req, res, next);
-
-  await getSource(req, res, next);
-
-  const source = req.source;
-
   // create action
-  const action = new Action({ type: 'subscribe', user: req.user._id, entity: source._id, entityType: 'Source' });
-
-  await action.createByUser(req.user).then().catch(e => next(e));
+  try {
+    const action = new Action({
+      type: 'subscribe',
+      user: req.user._id,
+      entity: req.source._id,
+      entityType: 'Source',
+    });
+    await action.createByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
 
   // update user
-  const sources = req.user.sources || [];
-  if (sources.indexOf(source._id) < 0) {
-    sources.push(source._id);
+  if (req.user.sources.indexOf(req.source._id) < 0) {
+    try {
+      await req.user.extend({
+        sources: req.user.sources.concat(req.source._id),
+      }).updateByUser(req.user);
+    } catch (err) {
+      return next(err);
+    }
   }
-  await req.user.extend({ sources }).updateByUser(req.user).then().catch(e => next(e));
 
-  res.json(source.securedInfo());
+  return res.json(req.source.securedInfo());
 };
 
 export const unsubscribe = async (req, res, next) => {
-  await isLoggedin(req, res, next);
-
-  await getSource(req, res, next);
-  const source = req.source;
-
   // create action
-  const action = new Action({ type: 'unsubscribe', user: req.user._id, entity: source._id, entityType: 'Source' });
-
-  await action.createByUser(req.user).then().catch(e => next(e));
-
-  // update user
-  const sources = req.user.sources || [];
-  const sourceIds = req.user.sources.map(sourceId => sourceId.toString());
-
-  const index = sourceIds.indexOf(source.id.toString());
-  if (index > -1) {
-    sources.splice(index, 1);
+  try {
+    const action = new Action({
+      type: 'unsubscribe',
+      user: req.user._id,
+      entity: req.source._id,
+      entityType: 'Source',
+    });
+    await action.createByUser(req.user);
+  } catch (err) {
+    return next(err);
   }
 
-  await req.user.extend({ sources }).updateByUser(req.user).then().catch(e => next(e));
+  // update user
+  const sources = req.user.sources.filter(id => id.toString() !== req.source._id.toString());
+  if (sources.length < req.user.sources.length) {
+    try {
+      await req.user.extend({
+        sources,
+      })
+      .updateByUser(req.user);
+    } catch (err) {
+      return next(err);
+    }
+  }
 
-  res.json(source.securedInfo());
+  return res.json(req.source.securedInfo());
 };
