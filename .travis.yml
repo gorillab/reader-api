@@ -9,7 +9,7 @@ services:
   - mongodb
 
 install:
-  - yarn
+  - yarn install
 
 cache:
   yarn: true
