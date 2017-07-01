@@ -1,7 +1,7 @@
 import Post from '../models/post';
 import Action from '../models/action';
 
-import { isLoggedin } from '../middlewares/auth';
+import isLoggedin from '../middlewares/auth';
 
 const getPost = async (req, res, next) => {
   const args = req.swagger.params;
