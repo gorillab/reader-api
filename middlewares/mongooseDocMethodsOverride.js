@@ -7,7 +7,9 @@ const mongooseDocMethodsOverride = (schema) => {
         at: new Date(),
       };
     }
-    this.created.by = user;
+    if (user) {
+      this.created.by = user._id;
+    }
 
     return this.create(cb);
   });
@@ -30,7 +32,9 @@ const mongooseDocMethodsOverride = (schema) => {
         at: new Date(),
       };
     }
-    this.updated.by = user;
+    if (user) {
+      this.created.by = user._id;
+    }
 
     return this.update(cb);
   });
@@ -55,7 +59,9 @@ const mongooseDocMethodsOverride = (schema) => {
         at: new Date(),
       };
     }
-    this.user = user;
+    if (user) {
+      this.created.by = user._id;
+    }
 
     return this.update(cb);
   });
