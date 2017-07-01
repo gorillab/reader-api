@@ -9,12 +9,10 @@ services:
   - mongodb
 
 install:
-  - yarn install
+  - yarn
 
 cache:
   yarn: true
-  directories:
-    - node_modules
 
 script:
   - yarn build
