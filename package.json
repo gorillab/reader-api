@@ -17,9 +17,9 @@
   "main": "index.js",
   "scripts": {
     "clean": "rm -rf dist",
-    "lint": "eslint .",
-    "start": "nodemon index.js --exec eslint . && babel-node",
-    "prebuild": "eslint .",
+    "lint": "eslint . --ignore-path .gitignore",
+    "start": "nodemon index.js --exec 'yarn lint && babel-node'",
+    "prebuild": "yarn lint",
     "build": "babel . --out-dir dist --copy-files --ignore node_modules,dist --minified",
     "serve": "node dist/index.js"
   },
@@ -56,6 +56,9 @@
     "nodemon": "^1.11.0"
   },
   "eslintConfig": {
+    "env": {
+      "node": true
+    },
     "extends": "airbnb",
     "rules": {
       "no-underscore-dangle": [2, {
