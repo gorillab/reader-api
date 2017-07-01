@@ -1,7 +1,6 @@
-import Promise from 'bluebird';
 import Mongoose from 'mongoose';
 import HttpStatus from 'http-status';
-import APIError from '../helper/APIError';
+import APIError from '../helpers/APIError';
 
 const Schema = Mongoose.Schema;
 
@@ -53,36 +52,32 @@ const postSchema = new Mongoose.Schema({
 
 postSchema.method({
   securedInfo() {
-    const obj = this.toObject();
-    obj.id = obj._id;
-    delete obj.isDeleted;
-    delete obj.created;
-    delete obj.updated;
-    delete obj.deleted;
-    delete obj._id;
-    return obj;
+    const { _id, title, content, image, url, source, meta } = this;
+
+    return {
+      id: _id,
+      title,
+      content,
+      image,
+      url,
+      source,
+      meta,
+    };
   },
 });
 
 postSchema.statics = {
-  get(id) {
-    return this.findById(id).exec().then((source) => {
-      if (source) {
-        return source;
-      }
-      const err = new APIError('No such post exists!', HttpStatus.NOT_FOUND, true);
-      return Promise.reject(err);
-    });
-  },
-  list(options) {
-    const query = options.query || {};
-    const page = options.page || 0;
-    const sort = options.sort || 'title';
-    const limit = options.limit || 0;
-    const select = options.select || 'id title content image url source meta';
+  async get(id) {
+    const post = await this.findById(id).exec();
 
-    return this.find(query).sort(sort).select(select).limit(limit)
-    .skip(limit * page)
+    return post || new APIError('No such post exists!', HttpStatus.NOT_FOUND, true);
+  },
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || 'title')
+    .select(select || 'id title content image url source meta')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
     .exec();
   },
 };

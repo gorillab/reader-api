@@ -1,7 +1,6 @@
 import Mongoose from 'mongoose';
-import Promise from 'bluebird';
 import HttpStatus from 'http-status';
-import APIError from '../helper/APIError';
+import APIError from '../helpers/APIError';
 
 
 const sourceSchema = new Mongoose.Schema({
@@ -19,39 +18,28 @@ const sourceSchema = new Mongoose.Schema({
 
 sourceSchema.method({
   securedInfo() {
-    const obj = this.toObject();
-    obj.id = obj._id;
-    delete obj.isDeleted;
-    delete obj.created;
-    delete obj.updated;
-    delete obj.deleted;
-    delete obj._id;
-    return obj;
+    const { _id, title, url } = this;
+
+    return {
+      id: _id,
+      title,
+      url,
+    };
   },
 });
 
 sourceSchema.statics = {
-  get(id) {
-    return this.findById(id).exec().then((source) => {
-      if (source) {
-        return source;
-      }
-      const err = new APIError('No such source exists!', HttpStatus.NOT_FOUND, true);
-      return Promise.reject(err);
-    });
-  },
-  list(options) {
-    const query = options.query || {};
-    const page = options.page || 0;
-    const sort = options.sort || 'title';
-    const limit = options.limit || 0;
-    const select = options.select || 'id title';
+  async get(id) {
+    const source = await this.findById(id).exec();
 
-    return this.find(query)
-    .sort(sort)
-    .select(select)
-    .limit(limit)
-    .skip(limit * page)
+    return source || new APIError('No such source exists!', HttpStatus.NOT_FOUND, true);
+  },
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || 'title')
+    .select(select || 'id title')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
     .exec();
   },
 };

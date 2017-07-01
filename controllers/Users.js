@@ -1,9 +1,13 @@
+import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
 import * as Users from './UsersService';
+import isLoggedin from '../middlewares/auth';
 
-export const getSavedPosts = (req, res, next) => {
-  Users.getSavedPosts(req, res, next);
-};
+export const getSavedPosts = MiddelwaresWrapper([
+  isLoggedin,
+  Users.getSavedPosts,
+]);
 
-export const getSubscriptions = (req, res, next) => {
-  Users.getSubscriptions(req, res, next);
-};
+export const getSubscriptions = MiddelwaresWrapper([
+  isLoggedin,
+  Users.getSubscriptions,
+]);

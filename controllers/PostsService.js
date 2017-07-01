@@ -1,50 +1,54 @@
 import Post from '../models/post';
 import Action from '../models/action';
 
-import isLoggedin from '../middlewares/auth';
-
-const getPost = async (req, res, next) => {
+export const getPost = async (req, res, next) => {
   const args = req.swagger.params;
 
   const id = args.id
     ? args.id.value
     : null;
 
-  await Post.get(id).then((post) => {
-    req.post = post;
-  }).catch(e => next(e));
+  try {
+    req.post = await Post.get(id);
+    next();
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const doPost = async (req, res, next) => {
-  await isLoggedin(req, res, next);
-
   const args = req.swagger.params;
-  await getPost(req, res, next);
-  const post = req.post;
-  const action = args.action.value;
 
   // create action
-  req.action = new Action({ type: action, user: req.user._id, entity: post._id, entityType: 'Post' });
-  await req.action.createByUser(req.user).then().catch(e => next(e));
-
-  switch (action) {
-    case 'save':
-      post.meta.numSaved += 1;
-      break;
-    case 'share':
-      post.meta.numShared += 1;
-      break;
-    case 'view':
-      post.meta.numViewed += 1;
-      break;
-    default:
-      post.meta.numViewed += 1;
-      break;
+  try {
+    const action = new Action({
+      type: args.action.value,
+      user: req.user._id,
+      entity: req.post._id,
+      entityType: 'Post',
+    });
+    await action.createByUser(req.user);
+  } catch (err) {
+    next(err);
   }
 
-  await post.extend(post).updateByUser(req.user).then().catch(e => next(e));
+  if (args.action.value === 'view') {
+    req.post.meta.numViewed += 1;
+  } else if (args.action.value === 'save') {
+    req.post.meta.numSaved += 1;
+  } else if (args.action.value === 'share') {
+    req.post.meta.numShared += 1;
+  }
 
-  res.json(post.securedInfo());
+  try {
+    await req.post.extend({
+      meta: req.post.meta,
+    }).updateByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
+
+  return res.json(req.post.securedInfo());
 };
 
 export const getPosts = async (req, res, next) => {
@@ -67,29 +71,34 @@ export const getPosts = async (req, res, next) => {
     ];
   }
 
-  const options = {
-    limit,
-    page,
-    sort,
-    query,
-  };
+  try {
+    const posts = await Post.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
 
-  Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
+    return res.json(posts);
+  } catch (err) {
+    return next(err);
+  }
 };
 
 export const removeActivity = async (req, res, next) => {
-  await isLoggedin(req, res, next);
-
   const args = req.swagger.params;
-  await getPost(req, res, next);
-  const post = req.post;
-  const action = args.action.value;
 
-  if (action === 'save') {
-    post.meta.numSaved -= 1;
+  if (args.action.value === 'save') {
+    req.post.meta.numSaved -= 1;
   }
 
-  await post.extend(post).updateByUser(req.user).then().catch(e => next(e));
+  try {
+    req.post.extend({
+      meta: req.post.meta,
+    }).updateByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
 
-  res.json(post.securedInfo());
+  return res.json(req.post.securedInfo());
 };

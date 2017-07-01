@@ -2,26 +2,23 @@ import Post from '../models/post';
 import Source from '../models/source';
 import Action from '../models/action';
 
-import isLoggedin from '../middlewares/auth';
-
 export const getSavedPosts = async (req, res, next) => {
-  await isLoggedin(req, res, next);
-
   const args = req.swagger.params;
-  let query = {
-    type: 'save',
-    entityType: 'Post',
-    user: req.user._id,
-  };
 
-  let options = {
-    select: 'entity',
-    query,
-  };
+  try {
+    req.actions = await Action.list({
+      select: 'entity',
+      query: {
+        type: 'save',
+        entityType: 'Post',
+        user: req.user._id,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
 
-  const postIds = await Action.list(options)
-  .then(actions => actions.map(action => action.entity.toString()))
-  .catch(e => next(e));
+  const postIds = req.actions.map(action => action.entity.toString());
 
   // get posts
   const limit = args.limit.value || 25;
@@ -31,7 +28,7 @@ export const getSavedPosts = async (req, res, next) => {
       : 1) - 1
     : 0;
   const sort = args.sort.value || 'title';
-  query = {
+  const query = {
     isDeleted: false,
     _id: {
       $in: postIds,
@@ -46,19 +43,21 @@ export const getSavedPosts = async (req, res, next) => {
     ];
   }
 
-  options = {
-    limit,
-    page,
-    sort,
-    query,
-  };
+  try {
+    const posts = await Post.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
 
-  Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
+    return res.json(posts);
+  } catch (err) {
+    return next(err);
+  }
 };
 
 export const getSubscriptions = async (req, res, next) => {
-  await isLoggedin(req, res, next);
-
   const args = req.swagger.params;
 
   const sourceIds = req.user.sources.map(sourceId => sourceId.toString());
@@ -85,12 +84,16 @@ export const getSubscriptions = async (req, res, next) => {
     ];
   }
 
-  const options = {
-    limit,
-    page,
-    sort,
-    query,
-  };
+  try {
+    const sources = await Source.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
 
-  Source.list(options).then(sources => res.json(sources)).catch(e => next(e));
+    res.json(sources);
+  } catch (err) {
+    next(err);
+  }
 };

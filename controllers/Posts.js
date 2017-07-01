@@ -1,13 +1,17 @@
+import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
 import * as Posts from './PostsService';
+import isLoggedin from '../middlewares/auth';
 
-export const doPost = (req, res, next) => {
-  Posts.doPost(req, res, next);
-};
+export const doPost = MiddelwaresWrapper([
+  isLoggedin,
+  Posts.getPost,
+  Posts.doPost,
+]);
 
-export const getPosts = (req, res, next) => {
-  Posts.getPosts(req, res, next);
-};
+export const getPosts = MiddelwaresWrapper(Posts.getPosts);
 
-export const removeActivity = (req, res, next) => {
-  Posts.removeActivity(req, res, next);
-};
+export const removeActivity = MiddelwaresWrapper([
+  isLoggedin,
+  Posts.getPost,
+  Posts.removeActivity,
+]);
