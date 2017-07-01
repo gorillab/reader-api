@@ -1,56 +1,47 @@
-/* eslint-disable */
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
+import HttpStatus from 'http-status';
+import APIError from '../helpers/APIError';
 
-const SourceSchema = new mongoose.Schema({
+
+const sourceSchema = new Mongoose.Schema({
   title: {
     type: String,
     require: true,
-    trim: true
+    trim: true,
   },
   url: {
     type: String,
     trim: true,
-    required: true
+    required: true,
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-    select: false
-  },
-  created: {
-    at: {
-      type: Date,
-      default: Date.now
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  updated: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  deleted: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  }
 });
 
-export default mongoose.model('Source', SourceSchema);
+sourceSchema.method({
+  securedInfo() {
+    const { _id, title, url } = this;
+
+    return {
+      id: _id,
+      title,
+      url,
+    };
+  },
+});
+
+sourceSchema.statics = {
+  async get(id) {
+    const source = await this.findById(id).exec();
+
+    return source || new APIError('No such source exists!', HttpStatus.NOT_FOUND, true);
+  },
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || 'title')
+    .select(select || 'id title')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
+    .exec();
+  },
+};
+
+export default Mongoose.model('Source', sourceSchema);

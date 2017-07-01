@@ -1,53 +1,109 @@
-/* eslint-disable */
-export function getSources(args, res, next) {
-  /**
-   * Returns all sources available in the database
-   *
-   * sort String Sort the list of sources by property (optional)
-   * limit Integer Limit number of sources return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "id" : "aeiou",
-  "title" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
-}
+import Source from '../models/source';
+import Action from '../models/action';
 
-export function subscribe(args, res, next) {
-  /**
-   * Subscribe a source
-   *
-   * id String Source id to subscibe
-   * returns Source
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "id" : "aeiou",
-  "title" : "aeiou"
+export const getSource = async (req, res, next) => {
+  const args = req.swagger.params;
+
+  const id = args.id
+    ? args.id.value
+    : null;
+
+  try {
+    req.source = await Source.get(id);
+    next();
+  } catch (err) {
+    next(err);
+  }
 };
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
-}
 
-export function unsubscribe(args, res, next) {
-  /**
-   * Unsubscribe a source
-   *
-   * id String id of the source to delete
-   * no response value expected for this operation
-   **/
-  res.end();
-}
+export const getSources = async (req, res, next) => {
+  const args = req.swagger.params;
+
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  const query = {};
+
+  if (args.query.value) {
+    query.$or = [
+      {
+        title: RegExp(args.query.value, 'i'),
+      },
+    ];
+  }
+
+  try {
+    const sources = await Source.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
+
+    res.json(sources);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const subscribe = async (req, res, next) => {
+  // create action
+  try {
+    const action = new Action({
+      type: 'subscribe',
+      user: req.user._id,
+      entity: req.source._id,
+      entityType: 'Source',
+    });
+    await action.createByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
+
+  // update user
+  if (req.user.sources.indexOf(req.source._id) < 0) {
+    try {
+      await req.user.extend({
+        sources: req.user.sources.concat(req.source._id),
+      }).updateByUser(req.user);
+    } catch (err) {
+      return next(err);
+    }
+  }
+
+  return res.json(req.source.securedInfo());
+};
+
+export const unsubscribe = async (req, res, next) => {
+  // create action
+  try {
+    const action = new Action({
+      type: 'unsubscribe',
+      user: req.user._id,
+      entity: req.source._id,
+      entityType: 'Source',
+    });
+    await action.createByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
+
+  // update user
+  const sources = req.user.sources.filter(id => id.toString() !== req.source._id.toString());
+  if (sources.length < req.user.sources.length) {
+    try {
+      await req.user.extend({
+        sources,
+      })
+      .updateByUser(req.user);
+    } catch (err) {
+      return next(err);
+    }
+  }
+
+  return res.json(req.source.securedInfo());
+};

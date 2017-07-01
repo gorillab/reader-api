@@ -1,91 +1,39 @@
-/* eslint-disable */
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
 
-const ActionSchema = new mongoose.Schema({
+const Schema = Mongoose.Schema;
+
+const actionSchema = new Mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['view', 'share', 'save']
+    enum: ['view', 'share', 'save', 'subscribe', 'unsubscribe'],
   },
   user: {
     type: Schema.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
   },
   entity: {
     type: Schema.ObjectId,
-    required: true
+    required: true,
   },
   entityType: {
     type: String,
     required: true,
-    enum: ['Post', 'Source']
+    enum: ['Post', 'Source'],
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-    select: false
-  },
-  created: {
-    at: {
-      type: Date,
-      default: Date.now
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  updated: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  deleted: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  }
 });
 
-ActionSchema.method({});
 
-ActionSchema.statics = {
-  /**
-   * Get user
-   * @param {ObjectId} id - The objectId of action.
-   * @returns {Promise<Action, APIError>}
-   */
-  get(id) {
-    return true
+actionSchema.statics = {
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || '-created.at')
+    .select(select || '')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
+    .exec();
   },
-
-  /**
-   * List actions in descending order of 'created' timestamp.
-   * @param {number} skip - Number of actions to be skipped.
-   * @param {number} limit - Limit number of actions to be returned.
-   * @returns {Promise<User[]>}
-   */
-  list({
-    skip = 0,
-    limit = 25
-  } = {}) {
-    return true
-  }
 };
 
-export default mongoose.model('Action', ActionSchema);
+export default Mongoose.model('Action', actionSchema);
