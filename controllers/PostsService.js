@@ -3,7 +3,7 @@ import Action from '../models/action';
 
 import { isLoggedin } from '../middlewares/auth';
 
-async function getPost(req, res, next) {
+const getPost = async (req, res, next) => {
   const args = req.swagger.params;
 
   const id = args.id
@@ -12,11 +12,10 @@ async function getPost(req, res, next) {
 
   await Post.get(id).then((post) => {
     req.post = post;
-    return post;
   }).catch(e => next(e));
-}
+};
 
-export async function doPost(req, res, next) {
+export const doPost = async (req, res, next) => {
   await isLoggedin(req, res, next);
 
   const args = req.swagger.params;
@@ -46,9 +45,9 @@ export async function doPost(req, res, next) {
   await post.extend(post).updateByUser(req.user).then().catch(e => next(e));
 
   res.json(post.securedInfo());
-}
+};
 
-export async function getPosts(req, res, next) {
+export const getPosts = async (req, res, next) => {
   const args = req.swagger.params;
 
   const limit = args.limit.value || 25;
@@ -76,9 +75,9 @@ export async function getPosts(req, res, next) {
   };
 
   Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
-}
+};
 
-export async function removeActivity(req, res, next) {
+export const removeActivity = async (req, res, next) => {
   await isLoggedin(req, res, next);
 
   const args = req.swagger.params;
@@ -93,4 +92,4 @@ export async function removeActivity(req, res, next) {
   await post.extend(post).updateByUser(req.user).then().catch(e => next(e));
 
   res.json(post.securedInfo());
-}
+};
