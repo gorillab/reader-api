@@ -26,18 +26,12 @@ const actionSchema = new Mongoose.Schema({
 
 
 actionSchema.statics = {
-  list(options) {
-    const query = options.query || {};
-    const page = options.page || 0;
-    const sort = options.sort || '-created.at';
-    const limit = options.limit || 0;
-    const select = options.select || '';
-
-    return this.find(query)
-    .sort(sort)
-    .select(select)
-    .limit(limit)
-    .skip(limit * page)
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || '-created.at')
+    .select(select || '')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
     .exec();
   },
 };
