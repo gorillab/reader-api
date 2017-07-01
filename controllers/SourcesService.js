@@ -3,7 +3,7 @@ import Action from '../models/action';
 
 import isLoggedin from '../middlewares/auth';
 
-async function getSource(req, res, next) {
+const getSource = async (req, res, next) => {
   const args = req.swagger.params;
 
   const id = args.id
@@ -13,7 +13,7 @@ async function getSource(req, res, next) {
   await Source.get(id).then((source) => {
     req.source = source;
   }).catch(e => next(e));
-}
+};
 
 export const getSources = async (req, res, next) => {
   const args = req.swagger.params;
