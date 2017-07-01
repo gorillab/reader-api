@@ -62,25 +62,13 @@
     },
     "extends": "airbnb",
     "rules": {
-      "no-underscore-dangle": [
-        2,
-        {
-          "allow": [
-            "_id",
-            "__v"
-          ]
-        }
-      ],
-      "no-param-reassign": [
-        2,
-        {
-          "props": false
-        }
-      ],
-      "func-names": [
-        "error",
-        "never"
-      ]
+      "no-underscore-dangle": [2, {
+        "allow": ["_id", "__v"]
+      }],
+      "no-param-reassign": [2, {
+        "props": false
+      }],
+      "func-names": ["error", "never"]
     }
   },
   "babel": {
