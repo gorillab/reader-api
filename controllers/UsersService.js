@@ -2,9 +2,9 @@ import Post from '../models/post';
 import Source from '../models/source';
 import Action from '../models/action';
 
-import { isLoggedin } from '../middlewares/auth';
+import isLoggedin from '../middlewares/auth';
 
-export async function getSavedPosts(req, res, next) {
+export const getSavedPosts = async (req, res, next) => {
   await isLoggedin(req, res, next);
 
   const args = req.swagger.params;
@@ -54,9 +54,9 @@ export async function getSavedPosts(req, res, next) {
   };
 
   Post.list(options).then(posts => res.json(posts)).catch(e => next(e));
-}
+};
 
-export async function getSubscriptions(req, res, next) {
+export const getSubscriptions = async (req, res, next) => {
   await isLoggedin(req, res, next);
 
   const args = req.swagger.params;
@@ -93,4 +93,4 @@ export async function getSubscriptions(req, res, next) {
   };
 
   Source.list(options).then(sources => res.json(sources)).catch(e => next(e));
-}
+};
