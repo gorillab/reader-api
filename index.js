@@ -84,12 +84,8 @@ Mongoose.connection.on('open', () => {
       controllers: Path.join(__dirname, './controllers'),
       useStubs: process.env.NODE_ENV === 'development',
     }));
-    app.use(middleware.swaggerUi());
-                     // Swagger UI
-    app.use((req, res, next) => {
-      console.log('@@@@@@@@@@ 3 ');
-      return next(new APIError('API not found', HttpStatus.NOT_FOUND));
-    });
+    app.use(middleware.swaggerUi());                              // Swagger UI
+    app.use((req, res, next) => next(new APIError('API not found', HttpStatus.NOT_FOUND)));
     app.use((err, req, res, next) => {                            // eslint-disable-line
       console.log(err.stack);                                     // eslint-disable-line no-console
       const errorResponse = {
