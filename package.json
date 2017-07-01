@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "lint": "eslint . --ignore-path .gitignore",
-    "start": "nodemon index.js --exec 'yarn lint && babel-node'",
+    "start": "nodemon index.js --exec \"yarn lint && babel-node\"",
     "prebuild": "yarn lint",
     "build": "babel . --out-dir dist --copy-files --ignore node_modules,dist --minified",
     "serve": "node dist/index.js"

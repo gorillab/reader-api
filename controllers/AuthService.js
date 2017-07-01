@@ -3,11 +3,11 @@ import Passport from 'passport';
 
 import APIError from '../helper/APIError';
 
-export function loginByFacebook(req, res, next) {
+export const loginByFacebook = (req, res, next) => {
   Passport.authenticate('facebook')(req, res, next);
-}
+};
 
-export function loginByFacebookCallback(req, res, next) {
+export const loginByFacebookCallback = (req, res, next) => {
   Passport.authenticate('facebook', {
     failureFlash: false,
   }, (err1, user) => {
@@ -23,11 +23,11 @@ export function loginByFacebookCallback(req, res, next) {
       return res.json(req.user.securedInfo());
     });
   })(req, res, next);
-}
+};
 
-export function logout(req, res) {
+export const logout = (req, res) => {
   req.logout();
   res.json({
     message: 'Done',
   });
-}
+};
