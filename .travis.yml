@@ -13,6 +13,8 @@ install:
 
 cache:
   yarn: true
+  directories:
+  - node_modules
 
 script:
   - yarn build
