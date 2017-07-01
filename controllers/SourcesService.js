@@ -1,7 +1,7 @@
 import Source from '../models/source';
 import Action from '../models/action';
 
-import { isLoggedin } from '../middlewares/auth';
+import isLoggedin from '../middlewares/auth';
 
 async function getSource(req, res, next) {
   const args = req.swagger.params;
@@ -12,11 +12,10 @@ async function getSource(req, res, next) {
 
   await Source.get(id).then((source) => {
     req.source = source;
-    return source;
   }).catch(e => next(e));
 }
 
-export async function getSources(req, res, next) {
+export const getSources = async (req, res, next) => {
   const args = req.swagger.params;
 
   const limit = args.limit.value || 25;
@@ -44,9 +43,9 @@ export async function getSources(req, res, next) {
   };
 
   Source.list(options).then(sources => res.json(sources)).catch(e => next(e));
-}
+};
 
-export async function subscribe(req, res, next) {
+export const subscribe = async (req, res, next) => {
   await isLoggedin(req, res, next);
 
   await getSource(req, res, next);
@@ -66,9 +65,9 @@ export async function subscribe(req, res, next) {
   await req.user.extend({ sources }).updateByUser(req.user).then().catch(e => next(e));
 
   res.json(source.securedInfo());
-}
+};
 
-export async function unsubscribe(req, res, next) {
+export const unsubscribe = async (req, res, next) => {
   await isLoggedin(req, res, next);
 
   await getSource(req, res, next);
@@ -91,4 +90,4 @@ export async function unsubscribe(req, res, next) {
   await req.user.extend({ sources }).updateByUser(req.user).then().catch(e => next(e));
 
   res.json(source.securedInfo());
-}
+};
