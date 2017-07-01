@@ -9,14 +9,15 @@ services:
   - mongodb
 
 install:
-  - npm install
+  - yarn
 
 cache:
+  yarn: true
   directories:
     - node_modules
 
 script:
-  - npm run build
+  - yarn build
 
 notifications:
   email: false
