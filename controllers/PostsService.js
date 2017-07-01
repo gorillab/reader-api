@@ -1,3 +1,4 @@
+/* eslint-disable */
 export function doPost(args, res, next) {
   /**
    * Actions for the post
@@ -98,4 +99,3 @@ export function removeActivity(args, res, next) {
     res.end();
   }
 }
-

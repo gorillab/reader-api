@@ -1,56 +1,33 @@
-export function loginByFacebook(args, res, next) {
-  /**
-   * Logs user into the system by facebook
-   *
-   * returns Error
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "code" : 0,
-  "message" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
+import HttpStatus from 'http-status';
+import Passport from 'passport';
+
+import APIError from '../helper/APIError';
+
+export function loginByFacebook(req, res, next) {
+  Passport.authenticate('facebook')(req, res, next);
 }
 
-export function loginByFacebookCallback(args, res, next) {
-  /**
-   * Facebook call this api to return result of authentication
-   *
-   * returns Error
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "code" : 0,
-  "message" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
+export function loginByFacebookCallback(req, res, next) {
+  Passport.authenticate('facebook', {
+    failureFlash: false,
+  }, (err1, user) => {
+    if (err1) {
+      return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true);
+    }
+
+    return req.logIn(user, (err2) => {
+      if (err2) {
+        return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true);
+      }
+
+      return res.json(req.user.securedInfo());
+    });
+  })(req, res, next);
 }
 
-export function logout(args, res, next) {
-  /**
-   * Logs out current logged in user session
-   *
-   * returns inline_response_200
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "message" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
+export function logout(req, res) {
+  req.logout();
+  res.json({
+    message: 'Done',
+  });
 }
-

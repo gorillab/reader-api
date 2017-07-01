@@ -1,3 +1,4 @@
+/* eslint-disable */
 export function getSavedPosts(args, res, next) {
   /**
    * Returns all saved post of user available in the database
@@ -55,4 +56,3 @@ export function getSubscriptions(args, res, next) {
     res.end();
   }
 }
-

@@ -1,3 +1,4 @@
+/* eslint-disable */
 export function getSources(args, res, next) {
   /**
    * Returns all sources available in the database
@@ -50,4 +51,3 @@ export function unsubscribe(args, res, next) {
    **/
   res.end();
 }
-

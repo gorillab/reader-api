@@ -1,119 +1,111 @@
-import mongoose from 'mongoose';
-const Schema = mongoose.Schema;
+import Mongoose from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
+const Schema = Mongoose.Schema;
+
+const userSchema = new Mongoose.Schema({
   email: {
     type: String,
     match: [
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please enter a valid email'
+      // eslint-disable-next-line
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 'Please enter a valid email',
     ],
-    required: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
   },
   token: {
     type: String,
     trim: true,
-    required: true
+    required: true,
   },
   vendor: {
     type: String,
-    trim: true
+    trim: true,
   },
-  source: [
+  sources: [
     {
       type: Schema.ObjectId,
-      ref: 'Source'
-    }
+      ref: 'Source',
+    },
   ],
   profile: {
     id: {
       type: String,
-      trim: true
+      trim: true,
     },
     username: {
       type: String,
-      trim: true
+      trim: true,
     },
     displayName: {
       type: String,
-      trim: true
+      trim: true,
     },
     name: {
       familyName: {
         type: String,
-        trim: true
+        trim: true,
       },
       givenName: {
         type: String,
-        trim: true
+        trim: true,
       },
       middleName: {
         type: String,
-        trim: true
-      }
+        trim: true,
+      },
     },
     gender: {
       type: String,
       trim: true,
-      enum: ['male', 'female']
+      enum: ['male', 'female'],
     },
     profileUrl: {
       type: String,
-      trim: true
+      trim: true,
     },
     emails: [
       {
         type: String,
         lowercase: true,
-        trim: true
-      }
+        trim: true,
+      },
     ],
     photos: [
       {
         type: String,
-        trim: true
-      }
-    ]
+        trim: true,
+      },
+    ],
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-    select: false
-  },
-  created: {
-    at: {
-      type: Date,
-      default: Date.now
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  updated: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  },
-  deleted: {
-    at: {
-      type: Date,
-      select: false
-    },
-    by: {
-      type: Schema.ObjectId,
-      ref: 'User',
-      select: false
-    }
-  }
 });
 
-export default mongoose.model('User', UserSchema);
+userSchema.method({
+  securedInfo() {
+    const { _id, email, sources, profile } = this;
+
+    return {
+      id: _id,
+      email,
+      sources,
+      profile,
+    };
+  },
+});
+
+userSchema.statics = {
+  get({ select, query }, cb) {
+    return this.findOne(query)
+    .select(select || 'email sources profile')
+    .exec(cb);
+  },
+  list({ query, page, sort, limit, select }) {
+    return this.find(query || {})
+    .sort(sort || '-created.at')
+    .select(select || 'email sources profile')
+    .skip((limit || 0) * (page || 0))
+    .limit(limit || 0)
+    .exec();
+  },
+};
+
+export default Mongoose.model('User', userSchema);
