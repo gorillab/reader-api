@@ -18,8 +18,6 @@ export const getSavedPosts = async (req, res, next) => {
     return next(err);
   }
 
-  const postIds = req.actions.map(action => action.entity.toString());
-
   // get posts
   const limit = args.limit.value || 25;
   const page = args.page.value
@@ -31,7 +29,7 @@ export const getSavedPosts = async (req, res, next) => {
   const query = {
     isDeleted: false,
     _id: {
-      $in: postIds,
+      $in: req.actions.map(action => action.entity.toString()),
     },
   };
 
@@ -60,7 +58,6 @@ export const getSavedPosts = async (req, res, next) => {
 export const getSubscriptions = async (req, res, next) => {
   const args = req.swagger.params;
 
-  const sourceIds = req.user.sources.map(sourceId => sourceId.toString());
 
   const limit = args.limit.value || 25;
   const page = args.page.value
@@ -72,7 +69,7 @@ export const getSubscriptions = async (req, res, next) => {
   const query = {
     isDeleted: false,
     _id: {
-      $in: sourceIds,
+      $in: req.user.sources.map(sourceId => sourceId.toString()),
     },
   };
 
