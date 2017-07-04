@@ -1,58 +1,96 @@
-/* eslint-disable */
-export function getSavedPosts(args, res, next) {
-  /**
-   * Returns all saved post of user available in the database
-   *
-   * sort String Sort the list of posts by property (optional)
-   * limit Integer Limit number of posts return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
-}
+import Post from '../models/post';
+import Source from '../models/source';
+import Action from '../models/action';
 
-export function getSubscriptions(args, res, next) {
-  /**
-   * Returns all sources of user available in the database
-   *
-   * sort String Sort the list of sources by property (optional)
-   * limit Integer Limit number of sources return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "id" : "aeiou",
-  "title" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
+export const getSavedPosts = async (req, res, next) => {
+  const args = req.swagger.params;
+
+  try {
+    req.actions = await Action.list({
+      select: 'entity',
+      query: {
+        type: 'save',
+        entityType: 'Post',
+        user: req.user._id,
+      },
+    });
+  } catch (err) {
+    return next(err);
   }
-}
+
+  // get posts
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  const query = {
+    isDeleted: false,
+    _id: {
+      $in: req.actions.map(action => action.entity.toString()),
+    },
+  };
+
+  if (args.query.value) {
+    query.$or = [
+      {
+        title: RegExp(args.query.value, 'i'),
+      },
+    ];
+  }
+
+  try {
+    const posts = await Post.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
+
+    return res.json(posts);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const getSubscriptions = async (req, res, next) => {
+  const args = req.swagger.params;
+
+
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  const query = {
+    isDeleted: false,
+    _id: {
+      $in: req.user.sources.map(sourceId => sourceId.toString()),
+    },
+  };
+
+  if (args.query.value) {
+    query.$or = [
+      {
+        title: RegExp(args.query.value, 'i'),
+      },
+    ];
+  }
+
+  try {
+    const sources = await Source.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
+
+    res.json(sources);
+  } catch (err) {
+    next(err);
+  }
+};
