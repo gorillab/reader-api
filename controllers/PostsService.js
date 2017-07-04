@@ -32,15 +32,15 @@ export const doPost = async (req, res, next) => {
     next(err);
   }
 
-  if (args.action.value === 'view') {
-    req.post.meta.numViewed += 1;
-  } else if (args.action.value === 'save') {
-    req.post.meta.numSaved += 1;
-  } else if (args.action.value === 'share') {
-    req.post.meta.numShared += 1;
-  }
-
   try {
+    if (args.action.value === 'view') {
+      req.post.meta.numViewed += 1;
+    } else if (args.action.value === 'save') {
+      req.post.meta.numSaved += 1;
+    } else if (args.action.value === 'share') {
+      req.post.meta.numShared += 1;
+    }
+
     await req.post.extend({
       meta: req.post.meta,
     }).updateByUser(req.user);
