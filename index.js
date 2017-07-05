@@ -17,7 +17,7 @@ import HttpStatus from 'http-status';
 import bluebird from 'bluebird';
 import { config } from 'dotenv';
 
-import APIError from './helper/APIError';
+import APIError from './helpers/APIError';
 import mongooseDefaultFields from './middlewares/mongooseDefaultFields';
 import mongooseDefaultIndexes from './middlewares/mongooseDefaultIndexes';
 import mongooseDocExtend from './middlewares/mongooseDocExtend';
@@ -86,7 +86,7 @@ Mongoose.connection.on('open', () => {
     }));
     app.use(middleware.swaggerUi());                              // Swagger UI
     app.use((req, res, next) => next(new APIError('API not found', HttpStatus.NOT_FOUND)));
-    app.use((err, req, res) => {
+    app.use((err, req, res, next) => {                            // eslint-disable-line
       console.log(err.stack);                                     // eslint-disable-line no-console
       const errorResponse = {
         message: err.isPublic ? err.message : HttpStatus[err.status],

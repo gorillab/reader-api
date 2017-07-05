@@ -1,16 +1,17 @@
-/* eslint-disable */
-import url from 'url';
-
+import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
 import * as Posts from './PostsService';
+import isLoggedin from '../middlewares/auth';
 
-export function doPost(req, res, next) {
-  Posts.doPost(req.swagger.params, res, next);
-};
+export const doPost = MiddelwaresWrapper([
+  isLoggedin,
+  Posts.getPost,
+  Posts.doPost,
+]);
 
-export function getPosts(req, res, next) {
-  Posts.getPosts(req.swagger.params, res, next);
-};
+export const getPosts = MiddelwaresWrapper(Posts.getPosts);
 
-export function removeActivity(req, res, next) {
-  Posts.removeActivity(req.swagger.params, res, next);
-};
+export const removeActivity = MiddelwaresWrapper([
+  isLoggedin,
+  Posts.getPost,
+  Posts.removeActivity,
+]);

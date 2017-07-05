@@ -1,12 +1,13 @@
-/* eslint-disable */
-import url from 'url';
-
+import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
 import * as Users from './UsersService';
+import isLoggedin from '../middlewares/auth';
 
-export function getSavedPosts(req, res, next) {
-  Users.getSavedPosts(req.swagger.params, res, next);
-};
+export const getSavedPosts = MiddelwaresWrapper([
+  isLoggedin,
+  Users.getSavedPosts,
+]);
 
-export function getSubscriptions(req, res, next) {
-  Users.getSubscriptions(req.swagger.params, res, next);
-};
+export const getSubscriptions = MiddelwaresWrapper([
+  isLoggedin,
+  Users.getSubscriptions,
+]);

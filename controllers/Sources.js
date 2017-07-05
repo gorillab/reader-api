@@ -1,16 +1,17 @@
-/* eslint-disable */
-import url from 'url';
-
+import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
 import * as Sources from './SourcesService';
+import isLoggedin from '../middlewares/auth';
 
-export function getSources(req, res, next) {
-  Sources.getSources(req.swagger.params, res, next);
-};
+export const getSources = MiddelwaresWrapper(Sources.getSources);
 
-export function subscribe(req, res, next) {
-  Sources.subscribe(req.swagger.params, res, next);
-};
+export const subscribe = MiddelwaresWrapper([
+  isLoggedin,
+  Sources.getSource,
+  Sources.subscribe,
+]);
 
-export function unsubscribe(req, res, next) {
-  Sources.unsubscribe(req.swagger.params, res, next);
-};
+export const unsubscribe = MiddelwaresWrapper([
+  isLoggedin,
+  Sources.getSource,
+  Sources.unsubscribe,
+]);

@@ -1,7 +1,7 @@
 import HttpStatus from 'http-status';
 import Passport from 'passport';
 
-import APIError from '../helper/APIError';
+import APIError from '../helpers/APIError';
 
 export const loginByFacebook = (req, res, next) => {
   Passport.authenticate('facebook')(req, res, next);

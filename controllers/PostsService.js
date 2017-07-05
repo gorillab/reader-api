@@ -1,101 +1,104 @@
-/* eslint-disable */
-export function doPost(args, res, next) {
-  /**
-   * Actions for the post
-   *
-   * id String Post id to view/save/share
-   * action String Post id to view/save/share
-   * returns Post
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
-}
+import Post from '../models/post';
+import Action from '../models/action';
 
-export function getPosts(args, res, next) {
-  /**
-   * Returns all posts available in the database
-   *
-   * sort String Sort the list of posts by property (optional)
-   * limit Integer Limit number of posts return from server (optional)
-   * page Integer How many rows to skip (optional)
-   * query String Keywords to search (optional)
-   * returns List
-   **/
-  let examples = {};
-  examples['application/json'] = [ {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-} ];
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
-  }
-}
+export const getPost = async (req, res, next) => {
+  const args = req.swagger.params;
 
-export function removeActivity(args, res, next) {
-  /**
-   * Remove action for the post
-   *
-   * id String Post id
-   * action String Post id
-   * returns Post
-   **/
-  let examples = {};
-  examples['application/json'] = {
-  "image" : "aeiou",
-  "meta" : {
-    "numShared" : 6,
-    "numViewed" : 0,
-    "numSaved" : 1
-  },
-  "id" : "aeiou",
-  "source" : {
-    "id" : "aeiou",
-    "title" : "aeiou"
-  },
-  "title" : "aeiou",
-  "content" : "aeiou",
-  "url" : "aeiou"
-};
-  if (Object.keys(examples).length > 0) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(examples[Object.keys(examples)[0]] || {}, null, 2));
-  } else {
-    res.end();
+  const id = args.id
+    ? args.id.value
+    : null;
+
+  try {
+    req.post = await Post.get(id);
+    next();
+  } catch (err) {
+    next(err);
   }
-}
+};
+
+export const doPost = async (req, res, next) => {
+  const args = req.swagger.params;
+
+  // create action
+  try {
+    const action = new Action({
+      type: args.action.value,
+      user: req.user._id,
+      entity: req.post._id,
+      entityType: 'Post',
+    });
+    await action.createByUser(req.user);
+  } catch (err) {
+    next(err);
+  }
+
+  try {
+    if (args.action.value === 'view') {
+      req.post.meta.numViewed += 1;
+    } else if (args.action.value === 'save') {
+      req.post.meta.numSaved += 1;
+    } else if (args.action.value === 'share') {
+      req.post.meta.numShared += 1;
+    }
+
+    await req.post.extend({
+      meta: req.post.meta,
+    }).updateByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
+
+  return res.json(req.post.securedInfo());
+};
+
+export const getPosts = async (req, res, next) => {
+  const args = req.swagger.params;
+
+  const limit = args.limit.value || 25;
+  const page = args.page.value
+    ? (args.page.value > 0
+      ? args.page.value
+      : 1) - 1
+    : 0;
+  const sort = args.sort.value || 'title';
+  const query = {};
+
+  if (args.query.value) {
+    query.$or = [
+      {
+        title: RegExp(args.query.value, 'i'),
+      },
+    ];
+  }
+
+  try {
+    const posts = await Post.list({
+      limit,
+      page,
+      sort,
+      query,
+    });
+
+    return res.json(posts);
+  } catch (err) {
+    return next(err);
+  }
+};
+
+export const removeActivity = async (req, res, next) => {
+  const args = req.swagger.params;
+
+  if (args.action.value === 'save') {
+    req.post.meta.numSaved -= 1;
+  }
+
+  try {
+    req.post.extend({
+      meta: req.post.meta,
+    }).updateByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
+
+  return res.json(req.post.securedInfo());
+};
