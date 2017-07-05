@@ -8,7 +8,7 @@ info:
     name: "Gorillab"
     url: "https://gorillab.co/"
     email: "hello@gorillab.co"
-host: "localhost:3000"
+host: "localhost:9000"
 basePath: "/api/v1"
 tags:
 - name: "auth"
