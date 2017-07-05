@@ -25,9 +25,13 @@ export const loginByFacebookCallback = (req, res, next) => {
   })(req, res, next);
 };
 
-export const logout = (req, res) => {
-  req.logout();
-  res.json({
-    message: 'Done',
-  });
+export const logout = (req, res, next) => {
+  try {
+    req.logout();
+    res.json({
+      message: 'Done',
+    });
+  } catch (err) {
+    next(err);
+  }
 };
