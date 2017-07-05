@@ -7,6 +7,7 @@ import Express from 'express';
 import Mongoose from 'mongoose';
 import IncludeAll from 'include-all';
 import Passport from 'passport';
+import Logger from 'morgan';
 import BodyParser from 'body-parser';
 import CookieParser from 'cookie-parser';
 import ExpressSession from 'express-session';
@@ -53,6 +54,7 @@ Mongoose.connection.on('open', () => {
   SwaggerTools.initializeMiddleware(Jsyaml.safeLoad(Fs.readFileSync(Path.join(__dirname, '/api/swagger.yaml'), 'utf8')), (middleware) => {
     // Init the server
     const app = Express();
+    app.use(Logger('common'));
     app.use(CookieParser());
     app.use(BodyParser.json({ limit: '1mb' }));
     app.use(BodyParser.urlencoded({ extended: true }));
