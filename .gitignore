@@ -62,4 +62,3 @@ dist
 .env
 
 .yarnclean
-yarn.lock
