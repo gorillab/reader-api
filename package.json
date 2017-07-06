@@ -49,6 +49,8 @@
   "devDependencies": {
     "babel-cli": "^6.24.1",
     "babel-core": "^6.25.0",
+    "babel-plugin-transform-regenerator": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-airbnb": "^2.4.0",
     "eslint": "3.19.0",
     "eslint-config-airbnb": "15.0.1",
@@ -64,18 +66,34 @@
     },
     "extends": "airbnb",
     "rules": {
-      "no-underscore-dangle": [2, {
-        "allow": ["_id", "__v"]
-      }],
-      "no-param-reassign": [2, {
-        "props": false
-      }],
-      "func-names": ["error", "never"]
+      "no-underscore-dangle": [
+        2,
+        {
+          "allow": [
+            "_id",
+            "__v"
+          ]
+        }
+      ],
+      "no-param-reassign": [
+        2,
+        {
+          "props": false
+        }
+      ],
+      "func-names": [
+        "error",
+        "never"
+      ]
     }
   },
   "babel": {
     "presets": [
       "airbnb"
+    ],
+    "plugins": [
+      "transform-runtime",
+      "transform-regenerator"
     ]
   }
 }
