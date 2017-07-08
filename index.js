@@ -94,7 +94,7 @@ Mongoose.connection.on('open', () => {
         message: err.isPublic ? err.message : HttpStatus[err.status],
         stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
       };
-      res.status(err.status).json(errorResponse);
+      res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).json(errorResponse);
     });
 
     // Start the server

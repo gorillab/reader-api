@@ -9,7 +9,7 @@ info:
     url: "https://gorillab.co/"
     email: "hello@gorillab.co"
 host: "localhost:9000"
-basePath: "/api/v1"
+basePath: "/v1"
 tags:
 - name: "auth"
   description: "Auth module"
