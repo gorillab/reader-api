@@ -54,7 +54,7 @@ Mongoose.connection.on('open', () => {
   SwaggerTools.initializeMiddleware(Jsyaml.safeLoad(Fs.readFileSync(Path.join(__dirname, '/api/swagger.yaml'), 'utf8')), (middleware) => {
     // Init the server
     const app = Express();
-    app.use(Logger('common'));
+    app.use(Logger('combined'));
     app.use(CookieParser());
     app.use(BodyParser.json({ limit: '1mb' }));
     app.use(BodyParser.urlencoded({ extended: true }));
