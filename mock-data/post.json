@@ -1,0 +1,49 @@
+{
+  "list": [{
+    "id" : "595750e2400327c53593f1b3",
+    "image" : "https://cdn-images-1.medium.com/max/2000/1*T551HACMn9A95dnwpPK-eQ.png",
+    "meta" : {
+      "numShared" : 6,
+      "numViewed" : 10,
+      "numSaved" : 2
+    },
+    "source" : {
+      "id" : "595750e2400327c53593f1b1",
+      "title" : "Medium"
+    },
+    "title" : "Choosing a frontend framework in 2017",
+    "content" : "There’s been a lot of development in the frontend frameworks ecosystem over the last seven years. We’ve learned a lot about what it takes to build and maintain large applications.",
+    "url" : "https://medium.com/this-dot-labs/building-modern-web-applications-in-2017-791d2ef2e341"
+  }, {
+    "id" : "595750e2400327c53593f1b4",
+    "image" : "https://cdn-images-1.medium.com/max/2000/1*OyugeWjSxQ4a7DanyRUQig.jpeg",
+    "meta" : {
+      "numShared" : 3,
+      "numViewed" : 15,
+      "numSaved" : 2
+    },
+    "source" : {
+      "id" : "595750e2400327c53593f1b1",
+      "title" : "Medium"
+    },
+    "title" : "The state of JavaScript modules",
+    "content" : "Recently, there was a lot of fuss on Twitter regarding the current state of ES modules, especially in Node.js, which decided to introduce *.mjs as file extension. The fear and uncertainty is understandable since the topic is complex and following the discussions takes a high degree of effort and dedication.",
+    "url" : "https://medium.com/webpack/the-state-of-javascript-modules-4636d1774358"
+  }],
+  "item": {
+    "id" : "595750e2400327c53593f1b3",
+    "image" : "https://cdn-images-1.medium.com/max/2000/1*T551HACMn9A95dnwpPK-eQ.png",
+    "meta" : {
+      "numShared" : 6,
+      "numViewed" : 10,
+      "numSaved" : 2
+    },
+    "source" : {
+      "id" : "595750e2400327c53593f1b1",
+      "title" : "Medium"
+    },
+    "title" : "Choosing a frontend framework in 2017",
+    "content" : "There’s been a lot of development in the frontend frameworks ecosystem over the last seven years. We’ve learned a lot about what it takes to build and maintain large applications.",
+    "url" : "https://medium.com/this-dot-labs/building-modern-web-applications-in-2017-791d2ef2e341"
+  }
+}
