@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint . --ignore-path .gitignore",
-    "start": "nodemon index.js --exec \"yarn lint && babel-node\"",
+    "start": "nodemon --exec \"yarn lint && babel-node .\"",
     "mock": "NODE_ENV=mock babel-node .",
     "prebuild": "yarn run clean && yarn lint",
     "build": "babel . --out-dir dist --ignore node_modules,dist,package.json,README.md,yarn.lock --copy-files --minified",
