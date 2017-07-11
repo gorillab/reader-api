@@ -19,8 +19,7 @@ export const loginByFacebookCallback = (req, res, next) => {
       if (err2) {
         return new APIError('Authentication error', HttpStatus.UNAUTHORIZED, true);
       }
-
-      return res.json(req.user.securedInfo());
+      return res.redirect(`${process.env.REDIRECT_URL}?loggedInUser=${JSON.stringify(user.securedInfo())}`);
     });
   })(req, res, next);
 };
