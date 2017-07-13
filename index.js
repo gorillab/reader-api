@@ -27,6 +27,9 @@ import mongooseDocMethodsOverride from './middlewares/mongooseDocMethodsOverride
 // Load .env
 config();
 
+// Load NewRelic
+require('newrelic');
+
 // Mongoose config
 Mongoose.Promise = bluebird;
 Mongoose.plugin(mongooseDefaultFields);
