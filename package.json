@@ -43,6 +43,7 @@
     "mongoose-deep-populate": "^3.0.0",
     "mongoose-unique-validator": "1.0.2",
     "morgan": "^1.8.2",
+    "newrelic": "^1.40.0",
     "passport": "0.3.2",
     "passport-facebook": "^2.1.1",
     "swagger-tools": "0.10.1"
