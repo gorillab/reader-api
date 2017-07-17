@@ -178,6 +178,59 @@ paths:
       security:
       - UserSecurity: []
       x-swagger-router-controller: "Users"
+  /user/for-you:
+    get:
+      tags:
+      - "users"
+      summary: "Returns all post belong to subscribed sources"
+      operationId: "forYou"
+      parameters:
+      - name: "sort"
+        in: "query"
+        description: "Sort the list of posts by property"
+        required: false
+        type: "string"
+        enum:
+        - "new"
+        - "best"
+        - "daily"
+      - name: "limit"
+        in: "query"
+        description: "Limit number of posts return from server"
+        required: false
+        type: "integer"
+        default: 25
+        maximum: 100
+        minimum: 1
+        format: "int32"
+      - name: "page"
+        in: "query"
+        description: "How many rows to skip"
+        required: false
+        type: "integer"
+        default: 0
+        maximum: 100
+        minimum: 0
+        format: "int32"
+      - name: "query"
+        in: "query"
+        description: "Keywords to search"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      security:
+      - UserSecurity: []
+      x-swagger-router-controller: "Users"
   /sources:
     get:
       tags:
