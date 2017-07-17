@@ -54,6 +54,7 @@ export const getSources = async (req, res, next) => {
 
     sources = sources.map((source) => {
       if (req.user && req.user.sources.indexOf(source._id.toString()) > -1) {
+        source = source.toJSON();
         source.isSubscribed = true;
       }
       return source;
