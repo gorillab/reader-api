@@ -11,6 +11,13 @@ export const doPost = process.env.NODE_ENV === 'mock' ? (req, res) => {
   Posts.doPost,
 ]);
 
+export const showPost = process.env.NODE_ENV === 'mock' ? (req, res) => {
+  res.json(postMockData.item);
+} : MiddelwaresWrapper([
+  Posts.getPost,
+  Posts.showPost,
+]);
+
 export const getPosts = process.env.NODE_ENV === 'mock' ? (req, res) => {
   res.json(postMockData.list);
 } : MiddelwaresWrapper(Posts.getPosts);

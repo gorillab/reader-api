@@ -69,8 +69,10 @@ postSchema.method({
 postSchema.statics = {
   async get(id) {
     const post = await this.findById(id).exec();
-
-    return post || new APIError('No such post exists!', HttpStatus.NOT_FOUND, true);
+    if (!post) {
+      throw new APIError('No such post exists!', HttpStatus.NOT_FOUND, true);
+    }
+    return post;
   },
   list({ query, page, sort, limit, select }) {
     return this.find(query || {})

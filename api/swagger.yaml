@@ -323,6 +323,28 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       x-swagger-router-controller: "Posts"
+  /posts/{id}:
+    get:
+      tags:
+      - "posts"
+      summary: "Return post detail"
+      operationId: "showPost"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Post id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+              $ref: "#/definitions/Post"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Posts"
   /posts/{id}/{action}:
     put:
       tags:
@@ -474,4 +496,3 @@ definitions:
         format: "int32"
         description: "Count number of saves in the post"
     description: "Meta of the post"
-

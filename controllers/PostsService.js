@@ -16,6 +16,10 @@ export const getPost = async (req, res, next) => {
   }
 };
 
+export const showPost = (req, res) => {
+  res.json(req.post.securedInfo());
+};
+
 export const doPost = async (req, res, next) => {
   const args = req.swagger.params;
 
