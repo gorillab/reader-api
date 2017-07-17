@@ -42,17 +42,50 @@ export const getSavedPosts = async (req, res, next) => {
   }
 
   try {
-    const posts = await Post.list({
+    req.posts = await Post.list({
       limit,
       page,
       sort,
       query,
     });
-
-    return res.json(posts);
   } catch (err) {
     return next(err);
   }
+
+  let posts = req.posts;
+
+  if (req.user) {
+    posts = await Promise.all(req.posts.map(async (post) => {
+      // get actions
+      const options = {
+        query: {
+          isDeleted: false,
+          entity: post._id,
+          entityType: 'Post',
+          type: {
+            $in: ['view', 'share', 'save'],
+          },
+          user: req.user._id,
+        },
+      };
+      const actions = await Action.list(options);
+
+      actions.forEach((action) => {
+        post = post.toJSON();
+        if (action.type === 'view') {
+          post.isViewed = true;
+        } else if (action.type === 'share') {
+          post.isShared = true;
+        } else {
+          post.isSaved = true;
+        }
+      });
+
+      return post;
+    }));
+  }
+
+  return res.json(posts);
 };
 
 export const getSubscriptions = async (req, res, next) => {
@@ -103,7 +136,6 @@ export const getSubscriptions = async (req, res, next) => {
   }
 };
 
-
 export const forYou = async (req, res, next) => {
   const args = req.swagger.params;
 
@@ -131,15 +163,48 @@ export const forYou = async (req, res, next) => {
   }
 
   try {
-    const posts = await Post.list({
+    req.posts = await Post.list({
       limit,
       page,
       sort,
       query,
     });
-
-    return res.json(posts);
   } catch (err) {
     return next(err);
   }
+
+  let posts = req.posts;
+
+  if (req.user) {
+    posts = await Promise.all(req.posts.map(async (post) => {
+      // get actions
+      const options = {
+        query: {
+          isDeleted: false,
+          entity: post._id,
+          entityType: 'Post',
+          type: {
+            $in: ['view', 'share', 'save'],
+          },
+          user: req.user._id,
+        },
+      };
+      const actions = await Action.list(options);
+
+      actions.forEach((action) => {
+        post = post.toJSON();
+        if (action.type === 'view') {
+          post.isViewed = true;
+        } else if (action.type === 'share') {
+          post.isShared = true;
+        } else {
+          post.isSaved = true;
+        }
+      });
+
+      return post;
+    }));
+  }
+
+  return res.json(posts);
 };

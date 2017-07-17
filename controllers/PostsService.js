@@ -16,8 +16,34 @@ export const getPost = async (req, res, next) => {
   }
 };
 
-export const showPost = (req, res) => {
-  res.json(req.post.securedInfo());
+export const showPost = async (req, res) => {
+  const post = req.post.securedInfo();
+  if (req.user) {
+    const options = {
+      query: {
+        isDeleted: false,
+        entity: req.post._id,
+        entityType: 'Post',
+        type: {
+          $in: ['view', 'share', 'save'],
+        },
+        user: req.user._id,
+      },
+    };
+    const actions = await Action.list(options);
+
+    actions.forEach((action) => {
+      if (action.type === 'view') {
+        post.isViewed = true;
+      } else if (action.type === 'share') {
+        post.isShared = true;
+      } else {
+        post.isSaved = true;
+      }
+    });
+  }
+
+  res.json(post);
 };
 
 export const doPost = async (req, res, next) => {
@@ -80,17 +106,50 @@ export const getPosts = async (req, res, next) => {
   }
 
   try {
-    const posts = await Post.list({
+    req.posts = await Post.list({
       limit,
       page,
       sort,
       query,
     });
-
-    return res.json(posts);
   } catch (err) {
     return next(err);
   }
+
+  let posts = req.posts;
+
+  if (req.user) {
+    posts = await Promise.all(req.posts.map(async (post) => {
+      // get actions
+      const options = {
+        query: {
+          isDeleted: false,
+          entity: post._id,
+          entityType: 'Post',
+          type: {
+            $in: ['view', 'share', 'save'],
+          },
+          user: req.user._id,
+        },
+      };
+      const actions = await Action.list(options);
+
+      actions.forEach((action) => {
+        post = post.toJSON();
+        if (action.type === 'view') {
+          post.isViewed = true;
+        } else if (action.type === 'share') {
+          post.isShared = true;
+        } else {
+          post.isSaved = true;
+        }
+      });
+
+      return post;
+    }));
+  }
+
+  return res.json(posts);
 };
 
 export const removeActivity = async (req, res, next) => {
