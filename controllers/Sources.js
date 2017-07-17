@@ -7,6 +7,13 @@ export const getSources = process.env.NODE_ENV === 'mock' ? (req, res) => {
   res.json(sourceMockData.list);
 } : MiddelwaresWrapper(Sources.getSources);
 
+export const showSource = process.env.NODE_ENV === 'mock' ? (req, res) => {
+  res.json(sourceMockData.item);
+} : MiddelwaresWrapper([
+  Sources.getSource,
+  Sources.showSource,
+]);
+
 export const subscribe = process.env.NODE_ENV === 'mock' ? (req, res) => {
   res.json(sourceMockData.item);
 } : MiddelwaresWrapper([

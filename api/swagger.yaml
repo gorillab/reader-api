@@ -227,6 +227,28 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       x-swagger-router-controller: "Sources"
+  /sources/{id}:
+    get:
+      tags:
+      - "sources"
+      summary: "Returns source detail"
+      operationId: "showSource"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "Source id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Source"
+        default:
+          description: "error operation"
+          schema:
+            $ref: "#/definitions/Error"
+      x-swagger-router-controller: "Sources"
   /sources/{id}/subscriptions:
     put:
       tags:

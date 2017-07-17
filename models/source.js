@@ -31,8 +31,10 @@ sourceSchema.method({
 sourceSchema.statics = {
   async get(id) {
     const source = await this.findById(id).exec();
-
-    return source || new APIError('No such source exists!', HttpStatus.NOT_FOUND, true);
+    if (!source) {
+      throw new APIError('No such source exists!', HttpStatus.NOT_FOUND, true);
+    }
+    return source;
   },
   list({ query, page, sort, limit, select }) {
     return this.find(query || {})

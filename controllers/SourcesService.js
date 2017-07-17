@@ -16,6 +16,10 @@ export const getSource = async (req, res, next) => {
   }
 };
 
+export const showSource = (req, res) => {
+  res.json(req.source.securedInfo());
+};
+
 export const getSources = async (req, res, next) => {
   const args = req.swagger.params;
 
