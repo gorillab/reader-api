@@ -75,6 +75,10 @@ export const getPosts = async (req, res, next) => {
     ];
   }
 
+  if (args.source) {
+    query.source = args.source.value;
+  }
+
   try {
     const posts = await Post.list({
       limit,
