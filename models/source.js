@@ -42,6 +42,7 @@ sourceSchema.statics = {
     .select(select || 'id title')
     .skip((limit || 0) * (page || 0))
     .limit(limit || 0)
+    .lean()
     .exec();
   },
 };

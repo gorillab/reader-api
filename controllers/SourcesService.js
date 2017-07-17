@@ -17,7 +17,11 @@ export const getSource = async (req, res, next) => {
 };
 
 export const showSource = (req, res) => {
-  res.json(req.source.securedInfo());
+  const source = req.source.securedInfo();
+  if (req.user && req.user.sources.indexOf(req.source._id.toString()) > -1) {
+    source.isSubscribed = true;
+  }
+  res.json(source);
 };
 
 export const getSources = async (req, res, next) => {
@@ -41,11 +45,18 @@ export const getSources = async (req, res, next) => {
   }
 
   try {
-    const sources = await Source.list({
+    let sources = await Source.list({
       limit,
       page,
       sort,
       query,
+    });
+
+    sources = sources.map((source) => {
+      if (req.user && req.user.sources.indexOf(source._id.toString()) > -1) {
+        source.isSubscribed = true;
+      }
+      return source;
     });
 
     res.json(sources);
