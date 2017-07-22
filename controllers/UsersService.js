@@ -9,6 +9,7 @@ export const getSavedPosts = async (req, res, next) => {
     req.actions = await Action.list({
       select: 'entity',
       query: {
+        isDeleted: false,
         type: 'save',
         entityType: 'Post',
         user: req.user._id,

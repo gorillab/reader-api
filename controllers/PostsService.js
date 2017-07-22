@@ -155,6 +155,31 @@ export const getPosts = async (req, res, next) => {
 export const removeActivity = async (req, res, next) => {
   const args = req.swagger.params;
 
+  // update action
+  try {
+    const options = {
+      query: {
+        isDeleted: false,
+        entity: req.post._id,
+        entityType: 'Post',
+        type: {
+          $in: ['view', 'share', 'save'],
+        },
+        user: req.user._id,
+      },
+    };
+    req.action = await Action.get(options);
+
+    if (req.action) {
+      req.action.extend({
+        isDeleted: true,
+      }).updateByUser(req.user);
+    }
+  } catch (err) {
+    return next(err);
+  }
+
+  // update post
   if (args.action.value === 'save') {
     req.post.meta.numSaved -= 1;
   }

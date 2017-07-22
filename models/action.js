@@ -26,6 +26,11 @@ const actionSchema = new Mongoose.Schema({
 
 
 actionSchema.statics = {
+  get({ select, query }) {
+    return this.findOne(query)
+    .select(select || '')
+    .exec();
+  },
   list({ query, page, sort, limit, select }) {
     return this.find(query || {})
     .sort(sort || '-created.at')
