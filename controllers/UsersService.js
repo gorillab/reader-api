@@ -209,3 +209,7 @@ export const forYou = async (req, res, next) => {
 
   return res.json(posts);
 };
+
+export const getUser = (req, res) => {
+  res.json(req.user.securedInfo());
+};

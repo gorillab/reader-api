@@ -3,6 +3,7 @@ import * as Users from './UsersService';
 import isLoggedin from '../middlewares/auth';
 import postMockData from '../mock-data/post.json';
 import sourceMockData from '../mock-data/source.json';
+import userMockData from '../mock-data/user.json';
 
 export const getSavedPosts = process.env.NODE_ENV === 'mock' ? (req, res) => {
   res.json(postMockData.list);
@@ -23,4 +24,11 @@ export const forYou = process.env.NODE_ENV === 'mock' ? (req, res) => {
 } : MiddelwaresWrapper([
   isLoggedin,
   Users.forYou,
+]);
+
+export const getUser = process.env.NODE_ENV === 'mock' ? (req, res) => {
+  res.json(userMockData.item);
+} : MiddelwaresWrapper([
+  isLoggedin,
+  Users.getUser,
 ]);
