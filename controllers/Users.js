@@ -17,3 +17,10 @@ export const getSubscriptions = process.env.NODE_ENV === 'mock' ? (req, res) => 
   isLoggedin,
   Users.getSubscriptions,
 ]);
+
+export const forYou = process.env.NODE_ENV === 'mock' ? (req, res) => {
+  res.json(postMockData.list);
+} : MiddelwaresWrapper([
+  isLoggedin,
+  Users.forYou,
+]);
