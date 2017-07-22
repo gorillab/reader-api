@@ -82,11 +82,19 @@ export const getSubscriptions = async (req, res, next) => {
   }
 
   try {
-    const sources = await Source.list({
+    let sources = await Source.list({
       limit,
       page,
       sort,
       query,
+    });
+
+    sources = sources.map((source) => {
+      if (req.user.sources.indexOf(source._id.toString()) > -1) {
+        source = source.toJSON();
+        source.isSubscribed = true;
+      }
+      return source;
     });
 
     res.json(sources);

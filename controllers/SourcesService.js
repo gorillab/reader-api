@@ -17,7 +17,12 @@ export const getSource = async (req, res, next) => {
 };
 
 export const showSource = (req, res) => {
-  res.json(req.source.securedInfo());
+  const source = req.source.securedInfo();
+  res.json({
+    ...source,
+    isSubscribed: req.user && req.user.sources.indexOf(source.id.toString()) !== -1
+      ? true : undefined,
+  });
 };
 
 export const getSources = async (req, res, next) => {
@@ -48,7 +53,16 @@ export const getSources = async (req, res, next) => {
       query,
     });
 
-    res.json(sources);
+    const results = sources.map((source) => {
+      source = source.securedInfo();
+      return {
+        ...source,
+        isSubscribed: req.user && req.user.sources.indexOf(source.id.toString()) !== -1
+          ? true : undefined,
+      };
+    });
+
+    res.json(results);
   } catch (err) {
     next(err);
   }
