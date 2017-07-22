@@ -320,7 +320,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       x-swagger-router-controller: "Sources"
-  /sources/{id}/subscriptions:
+  /sources/{id}/subscription:
     put:
       tags:
       - "sources"
