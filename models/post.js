@@ -68,7 +68,9 @@ postSchema.method({
 
 postSchema.statics = {
   async get(id) {
-    const post = await this.findById(id).exec();
+    const post = await this.findById(id)
+    .populate('source', 'title')
+    .exec();
     if (!post) {
       throw new APIError('No such post exists!', HttpStatus.NOT_FOUND, true);
     }
@@ -80,6 +82,7 @@ postSchema.statics = {
     .select(select || 'id title content image url source meta')
     .skip((limit || 0) * (page || 0))
     .limit(limit || 0)
+    .populate('source', 'title')
     .exec();
   },
 };

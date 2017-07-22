@@ -311,6 +311,11 @@ paths:
         description: "Keywords to search"
         required: false
         type: "string"
+      - name: "source"
+        in: "query"
+        description: "Filter posts by source"
+        required: false
+        type: "string"
       responses:
         200:
           description: "successful operation"
