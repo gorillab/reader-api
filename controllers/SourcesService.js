@@ -93,7 +93,10 @@ export const subscribe = async (req, res, next) => {
     }
   }
 
-  return res.json(req.source.securedInfo());
+  return res.json({
+    ...req.source.securedInfo(),
+    isSubscribed: true,
+  });
 };
 
 export const unsubscribe = async (req, res, next) => {
