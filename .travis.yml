@@ -27,6 +27,8 @@ deploy:
     on:
       branch: master
       node: '8'
+    run:
+      - yarn serve
   - provider: heroku
     api_key: $HEROKU_API_KEY
     skip_cleanup: true
@@ -34,6 +36,8 @@ deploy:
     on:
       tags: true
       node: '8'
+    run:
+      - yarn serve
 
 notifications:
   email: false
