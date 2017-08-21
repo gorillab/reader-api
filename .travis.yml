@@ -21,12 +21,14 @@ script:
 
 deploy:
   - provider: heroku
+    api_key: $HEROKU_API_KEY
     skip_cleanup: true
     app: glab-staging-reader-api
     on:
       branch: master
       node: '8'
   - provider: heroku
+    api_key: $HEROKU_API_KEY
     skip_cleanup: true
     app: glab-reader-api
     on:
