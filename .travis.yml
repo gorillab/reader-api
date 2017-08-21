@@ -19,6 +19,20 @@ cache:
 script:
   - yarn build
 
+deploy:
+  - provider: heroku
+    skip_cleanup: true
+    app: glab-staging-reader-api
+    on:
+      branch: master
+      node: '8'
+  - provider: heroku
+    skip_cleanup: true
+    app: glab-reader-api
+    on:
+      tags: true
+      node: '8'
+
 notifications:
   email: false
   slack:
