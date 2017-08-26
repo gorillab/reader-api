@@ -6,7 +6,6 @@ import postMockData from '../mock-data/post.json';
 export const doPost = process.env.NODE_ENV === 'mock' ? (req, res) => {
   res.json(postMockData.item);
 } : MiddelwaresWrapper([
-  isLoggedin,
   Posts.getPost,
   Posts.doPost,
 ]);
