@@ -133,9 +133,8 @@ export const getPosts = async (req, res, next) => {
         },
       };
       const actions = await Action.list(options);
-
+      post = post.toJSON();
       actions.forEach((action) => {
-        post = post.toJSON();
         if (action.type === 'view') {
           post.isViewed = true;
         } else if (action.type === 'share') {
