@@ -51,8 +51,8 @@ export const showPost = async (req, res) => {
 export const doPost = async (req, res, next) => {
   const args = req.swagger.params;
 
-  if (args.action.value === 'save' || args.action.value === 'share') {
-    if (!req.isAuthenticated()) {
+  if (args.action.value === 'save') {
+    if (!req.user) {
       const err = new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
       return next(err);
     }
@@ -62,7 +62,7 @@ export const doPost = async (req, res, next) => {
   try {
     const action = new Action({
       type: args.action.value,
-      user: req.isAuthenticated() ? req.user._id : null,
+      user: req.user ? req.user._id : null,
       entity: req.post._id,
       entityType: 'Post',
     });
