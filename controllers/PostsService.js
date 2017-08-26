@@ -53,7 +53,7 @@ export const doPost = async (req, res, next) => {
   try {
     const action = new Action({
       type: args.action.value,
-      user: req.user._id,
+      user: req.isAuthenticated() ? req.user._id : null,
       entity: req.post._id,
       entityType: 'Post',
     });
@@ -65,9 +65,9 @@ export const doPost = async (req, res, next) => {
   try {
     if (args.action.value === 'view') {
       req.post.meta.numViewed += 1;
-    } else if (args.action.value === 'save') {
+    } else if (req.isAuthenticated() && args.action.value === 'save') {
       req.post.meta.numSaved += 1;
-    } else if (args.action.value === 'share') {
+    } else if (req.isAuthenticated() && args.action.value === 'share') {
       req.post.meta.numShared += 1;
     }
 
