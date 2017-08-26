@@ -56,7 +56,7 @@ Mongoose.connection.on('open', () => {
     const app = Express();
 
     // Use gorillab health check
-    app.get('/health', Health);
+    app.use(Health());
     app.use(Logger('combined'));
     app.use(CookieParser());
     app.use(BodyParser.json({ limit: '1mb' }));
