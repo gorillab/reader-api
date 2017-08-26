@@ -38,7 +38,6 @@ Mongoose.plugin(mongooseDocMethodsOverride);
 const mongoUrl = `mongodb://${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}?reconnectTries=10&reconnectInterval=3000`;
 Mongoose.connect(mongoUrl);
 Mongoose.connection.on('open', () => {
-  console.log(`Mongoose connected at ${mongoUrl}`);               // eslint-disable-line no-console
   // Bootstrap mongoose models
   const models = IncludeAll({
     dirname: Path.join(__dirname, './models'),
@@ -107,7 +106,7 @@ Mongoose.connection.on('open', () => {
 
 // Mongoose connection error handler
 Mongoose.connection.on('error', (err) => {
-  console.log('Mongoose failed to connect:', mongoUrl, err);      // eslint-disable-line no-console
+  console.log('Mongoose failed to connect', err);      // eslint-disable-line no-console
   Mongoose.disconnect();
 });
 

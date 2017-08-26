@@ -1,9 +1,9 @@
-import Async from 'async';
+import eachSeries from 'async/eachSeries';
 
 const middlewaresWrapper = middlewares => (req, res, next) => {
   const funcs = Array.isArray(middlewares) ? middlewares : [middlewares];
 
-  Async.eachSeries(funcs, (func, cb) => {
+  eachSeries(funcs, (func, cb) => {
     func(req, res, (err) => {
       if (err) {
         next(err);
