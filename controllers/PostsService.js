@@ -1,5 +1,7 @@
+import httpStatus from 'http-status';
 import Post from '../models/post';
 import Action from '../models/action';
+import APIError from '../helpers/APIError';
 
 export const getPost = async (req, res, next) => {
   const args = req.swagger.params;
@@ -49,6 +51,13 @@ export const showPost = async (req, res) => {
 export const doPost = async (req, res, next) => {
   const args = req.swagger.params;
 
+  if (args.action.value === 'save' || args.action.value === 'share') {
+    if (!req.isAuthenticated()) {
+      const err = new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
+      return next(err);
+    }
+  }
+
   // create action
   try {
     const action = new Action({
@@ -65,9 +74,9 @@ export const doPost = async (req, res, next) => {
   try {
     if (args.action.value === 'view') {
       req.post.meta.numViewed += 1;
-    } else if (req.isAuthenticated() && args.action.value === 'save') {
+    } else if (args.action.value === 'save') {
       req.post.meta.numSaved += 1;
-    } else if (req.isAuthenticated() && args.action.value === 'share') {
+    } else if (args.action.value === 'share') {
       req.post.meta.numShared += 1;
     }
 
@@ -101,7 +110,7 @@ export const getPosts = async (req, res, next) => {
     ];
   }
 
-  if (args.source) {
+  if (args.source && args.source.value) {
     query.source = args.source.value;
   }
 
@@ -117,7 +126,6 @@ export const getPosts = async (req, res, next) => {
   }
 
   let posts = req.posts;
-
   if (req.user) {
     posts = await Promise.all(req.posts.map(async (post) => {
       // get actions
