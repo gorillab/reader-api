@@ -11,7 +11,6 @@ const actionSchema = new Mongoose.Schema({
   user: {
     type: Schema.ObjectId,
     ref: 'User',
-    required: true,
   },
   entity: {
     type: Schema.ObjectId,
