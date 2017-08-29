@@ -38,7 +38,7 @@ sourceSchema.statics = {
   },
   list({ query, page, sort, limit, select }) {
     return this.find(query || {})
-    .sort(sort || 'title')
+    .sort(sort || '-created.at')
     .select(select || 'id title')
     .skip((limit || 0) * (page || 0))
     .limit(limit || 0)

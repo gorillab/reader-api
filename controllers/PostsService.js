@@ -99,7 +99,7 @@ export const getPosts = async (req, res, next) => {
       ? args.page.value
       : 1) - 1
     : 0;
-  const sort = args.sort.value || 'title';
+  const sort = args.sort.value || '-created.at';
   const query = {};
 
   if (args.query.value) {
