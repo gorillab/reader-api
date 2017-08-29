@@ -99,8 +99,17 @@ export const getPosts = async (req, res, next) => {
       ? args.page.value
       : 1) - 1
     : 0;
-  const sort = args.sort.value || 'title';
+
+  const sort = args.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
   const query = {};
+
+  if (args.sort.value === 'daily') {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    query['created.at'] = {
+      $gte: startOfToday,
+    };
+  }
 
   if (args.query.value) {
     query.$or = [
