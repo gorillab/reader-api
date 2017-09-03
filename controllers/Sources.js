@@ -1,31 +1,38 @@
-import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
+import MiddelwaresWrapper from '../helpers/middlewaresWrapper';
 import * as Sources from './SourcesService';
-import isLoggedin from '../middlewares/auth';
-import sourceMockData from '../mock-data/source.json';
+import isLoggedIn from '../middlewares/auth';
 
-export const getSources = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(sourceMockData.list);
-} : MiddelwaresWrapper(Sources.getSources);
+import mock from '../middlewares/mock';
+import mockSource from '../data/mock/source.json';
 
-export const showSource = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(sourceMockData.item);
-} : MiddelwaresWrapper([
+const getSources = MiddelwaresWrapper([
+  mock(mockSource.list),
+  Sources.getSources,
+]);
+
+const showSource = MiddelwaresWrapper([
+  mock(mockSource.item),
   Sources.getSource,
   Sources.showSource,
 ]);
 
-export const subscribe = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(sourceMockData.item);
-} : MiddelwaresWrapper([
-  isLoggedin,
+const subscribe = MiddelwaresWrapper([
+  mock(mockSource.item),
+  isLoggedIn,
   Sources.getSource,
   Sources.subscribe,
 ]);
 
-export const unsubscribe = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(sourceMockData.item);
-} : MiddelwaresWrapper([
-  isLoggedin,
+const unsubscribe = MiddelwaresWrapper([
+  mock(mockSource.item),
+  isLoggedIn,
   Sources.getSource,
   Sources.unsubscribe,
 ]);
+
+export {
+  getSources,
+  showSource,
+  subscribe,
+  unsubscribe,
+};

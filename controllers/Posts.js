@@ -1,30 +1,39 @@
-import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
+import MiddelwaresWrapper from '../helpers/middlewaresWrapper';
 import * as Posts from './PostsService';
-import isLoggedin from '../middlewares/auth';
-import postMockData from '../mock-data/post.json';
+import isLoggedIn from '../middlewares/auth';
 
-export const doPost = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(postMockData.item);
-} : MiddelwaresWrapper([
-  Posts.getPost,
-  Posts.doPost,
+import mock from '../middlewares/mock';
+import mockPost from '../data/mock/post.json';
+
+const getPosts = MiddelwaresWrapper([
+  mock(mockPost.list),
+  Posts.getPosts,
 ]);
 
-export const showPost = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(postMockData.item);
-} : MiddelwaresWrapper([
+const showPost = MiddelwaresWrapper([
+  mock(mockPost.item),
   Posts.getPost,
   Posts.showPost,
 ]);
 
-export const getPosts = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(postMockData.list);
-} : MiddelwaresWrapper(Posts.getPosts);
+const createActivity = MiddelwaresWrapper([
+  mock(mockPost.item),
+  Posts.getPost,
+  Posts.createActivity,
+  Posts.showPost,
+]);
 
-export const removeActivity = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(postMockData.item);
-} : MiddelwaresWrapper([
-  isLoggedin,
+const removeActivity = MiddelwaresWrapper([
+  mock(mockPost.item),
+  isLoggedIn,
   Posts.getPost,
   Posts.removeActivity,
+  Posts.showPost,
 ]);
+
+export {
+  getPosts,
+  showPost,
+  createActivity,
+  removeActivity,
+};
