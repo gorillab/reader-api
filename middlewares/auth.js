@@ -1,7 +1,7 @@
 import httpStatus from 'http-status';
 import APIError from '../helpers/APIError';
 
-const isLoggedin = (req, res, next) => {
+const isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     const err = new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
 
@@ -11,4 +11,4 @@ const isLoggedin = (req, res, next) => {
   return next();
 };
 
-export default isLoggedin;
+export default isLoggedIn;
