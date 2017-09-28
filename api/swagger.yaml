@@ -201,7 +201,7 @@ paths:
       tags:
       - "users"
       summary: "Returns all post belong to subscribed sources"
-      operationId: "forYou"
+      operationId: "getForYouPosts"
       parameters:
       - name: "sort"
         in: "query"
@@ -448,7 +448,7 @@ paths:
       tags:
       - "posts"
       summary: "Actions for the post"
-      operationId: "doPost"
+      operationId: "createActivity"
       parameters:
       - name: "id"
         in: "path"
@@ -489,7 +489,7 @@ paths:
         type: "string"
       - name: "action"
         in: "path"
-        description: "Post id"
+        description: "Action"
         required: true
         type: "string"
         enum:

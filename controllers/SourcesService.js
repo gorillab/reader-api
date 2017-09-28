@@ -1,74 +1,90 @@
+import { BAD_REQUEST, NOT_FOUND } from 'http-status';
+
+import APIError from '../helpers/APIError';
 import Source from '../models/source';
 import Action from '../models/action';
 
-export const getSource = async (req, res, next) => {
-  const args = req.swagger.params;
-
-  const id = args.id
-    ? args.id.value
-    : null;
-
-  try {
-    req.source = await Source.get(id);
-    next();
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const showSource = (req, res) => {
-  const source = req.source.securedInfo();
-  res.json({
-    ...source,
-    isSubscribed: req.user && req.user.sources.indexOf(source.id.toString()) !== -1
-      ? true : undefined,
-  });
-};
-
-export const getSources = async (req, res, next) => {
-  const args = req.swagger.params;
-
-  const limit = args.limit.value || 25;
-  const page = args.page.value
-    ? (args.page.value > 0
-      ? args.page.value
-      : 1) - 1
-    : 0;
-  const sort = args.sort.value || 'title';
-  const query = {};
-
-  if (args.query.value) {
-    query.$or = [
-      {
-        title: RegExp(args.query.value, 'i'),
-      },
-    ];
+const addUserData = (user, source) => {
+  if (user.sources.some(s => s.toString() === source._id.toString())) {
+    return {
+      ...source,
+      isSubscribed: true,
+    };
   }
 
+  return source;
+};
+
+const getSources = async (req, res, next) => {
+  const params = req.swagger.params;
+  let sources = [];
+
   try {
-    const sources = await Source.list({
+    const limit = params.limit.value || 25;
+    const page = params.page.value
+      ? (params.page.value > 0
+        ? params.page.value
+        : 1) - 1
+      : 0;
+    const sort = params.sort.value || 'title';
+    const query = {};
+
+    if (params.query.value) {
+      query.$or = [
+        {
+          title: RegExp(params.query.value, 'i'),
+        },
+      ];
+    }
+
+    sources = await Source.list({
       limit,
       page,
       sort,
       query,
     });
-
-    const results = sources.map((source) => {
-      source = source.securedInfo();
-      return {
-        ...source,
-        isSubscribed: req.user && req.user.sources.indexOf(source.id.toString()) !== -1
-          ? true : undefined,
-      };
-    });
-
-    res.json(results);
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    return next(error);
   }
+
+  if (!req.user) {
+    return res.json(sources.map(source => source.securedInfo()));
+  }
+
+  return res.json(sources.map(source => addUserData(source.securedInfo())));
 };
 
-export const subscribe = async (req, res, next) => {
+const getSource = async (req, res, next) => {
+  const params = req.swagger.params;
+
+  if (!params.id) {
+    return next(new APIError('Invalid id', BAD_REQUEST));
+  }
+
+  try {
+    const source = await Source.get(params.id.value);
+
+    if (!source) {
+      return next(new APIError('Source not found', NOT_FOUND));
+    }
+
+    req.source = source;
+  } catch (err) {
+    return next(err);
+  }
+
+  return next();
+};
+
+const showSource = (req, res) => {
+  if (!req.user) {
+    res.json(req.source.securedInfo());
+  }
+
+  return res.json(addUserData(req.source.securedInfo()));
+};
+
+const subscribe = async (req, res, next) => {
   // create action
   try {
     const action = new Action({
@@ -77,19 +93,20 @@ export const subscribe = async (req, res, next) => {
       entity: req.source._id,
       entityType: 'Source',
     });
+
     await action.createByUser(req.user);
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    return next(error);
   }
 
   // update user
-  if (req.user.sources.indexOf(req.source._id) < 0) {
+  if (req.user.sources.indexOf() < 0) {
     try {
       await req.user.extend({
         sources: req.user.sources.concat(req.source._id),
       }).updateByUser(req.user);
-    } catch (err) {
-      return next(err);
+    } catch (error) {
+      return next(error);
     }
   }
 
@@ -99,7 +116,7 @@ export const subscribe = async (req, res, next) => {
   });
 };
 
-export const unsubscribe = async (req, res, next) => {
+const unsubscribe = async (req, res, next) => {
   // create action
   try {
     const action = new Action({
@@ -108,9 +125,10 @@ export const unsubscribe = async (req, res, next) => {
       entity: req.source._id,
       entityType: 'Source',
     });
+
     await action.createByUser(req.user);
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    return next(error);
   }
 
   // update user
@@ -121,10 +139,18 @@ export const unsubscribe = async (req, res, next) => {
         sources,
       })
       .updateByUser(req.user);
-    } catch (err) {
-      return next(err);
+    } catch (error) {
+      return next(error);
     }
   }
 
   return res.json(req.source.securedInfo());
+};
+
+export {
+  getSources,
+  getSource,
+  showSource,
+  subscribe,
+  unsubscribe,
 };

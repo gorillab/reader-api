@@ -1,193 +1,206 @@
-import httpStatus from 'http-status';
+import { BAD_REQUEST, NOT_FOUND, FORBIDDEN } from 'http-status';
+
 import Post from '../models/post';
 import Action from '../models/action';
 import APIError from '../helpers/APIError';
 
-export const getPost = async (req, res, next) => {
-  const args = req.swagger.params;
-
-  const id = args.id
-    ? args.id.value
-    : null;
-
-  try {
-    req.post = await Post.get(id);
-    next();
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const showPost = async (req, res) => {
-  const post = req.post.securedInfo();
-  if (req.user) {
-    const options = {
-      query: {
-        isDeleted: false,
-        entity: req.post._id,
-        entityType: 'Post',
-        type: {
-          $in: ['view', 'share', 'save'],
-        },
-        user: req.user._id,
-      },
-    };
-    const actions = await Action.list(options);
-
-    actions.forEach((action) => {
-      if (action.type === 'view') {
-        post.isViewed = true;
-      } else if (action.type === 'share') {
-        post.isShared = true;
-      } else {
-        post.isSaved = true;
-      }
-    });
-  }
-
-  res.json(post);
-};
-
-export const doPost = async (req, res, next) => {
-  const args = req.swagger.params;
-
-  if (args.action.value === 'save') {
-    if (!req.user) {
-      const err = new APIError('Authentication error', httpStatus.UNAUTHORIZED, true);
-      return next(err);
-    }
-  }
-
-  // create action
-  try {
-    const action = new Action({
-      type: args.action.value,
-      user: req.user ? req.user._id : null,
-      entity: req.post._id,
+const addUserData = async (user, post) => {
+  const actions = await Action.list({
+    query: {
+      isDeleted: false,
+      entity: post._id,
       entityType: 'Post',
-    });
-    await action.createByUser(req.user);
-  } catch (err) {
-    next(err);
-  }
+      type: {
+        $in: ['view', 'share', 'save'],
+      },
+      user: user._id,
+    },
+  });
 
-  try {
-    if (args.action.value === 'view') {
-      req.post.meta.numViewed += 1;
-    } else if (args.action.value === 'save') {
-      req.post.meta.numSaved += 1;
-    } else if (args.action.value === 'share') {
-      req.post.meta.numShared += 1;
+  return actions.reduce((result, { type }) => {
+    switch (type) {
+      case 'view':
+        return {
+          ...result,
+          isViewed: true,
+        };
+      case 'share':
+        return {
+          ...result,
+          isShared: true,
+        };
+      default:
+        return {
+          ...result,
+          isSaved: true,
+        };
     }
-
-    await req.post.extend({
-      meta: req.post.meta,
-    }).updateByUser(req.user);
-  } catch (err) {
-    return next(err);
-  }
-
-  return res.json(req.post.securedInfo());
+  }, post);
 };
 
-export const getPosts = async (req, res, next) => {
-  const args = req.swagger.params;
+const getPosts = async (req, res, next) => {
+  const params = req.swagger.params;
+  let posts = [];
 
-  const limit = args.limit.value || 25;
-  const page = args.page.value
-    ? (args.page.value > 0
-      ? args.page.value
-      : 1) - 1
-    : 0;
-
-  const sort = args.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
-  const query = {};
-
-  if (args.sort.value === 'daily') {
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    query['created.at'] = {
-      $gte: startOfToday,
-    };
-  }
-
-  if (args.query.value) {
-    query.$or = [
-      {
-        title: RegExp(args.query.value, 'i'),
-      },
-    ];
-  }
-
-  if (args.source && args.source.value) {
-    query.source = args.source.value;
-  }
-
+  // get posts
   try {
-    req.posts = await Post.list({
+    const limit = params.limit.value || 25;
+    const page = params.page.value
+      ? (params.page.value > 0
+        ? params.page.value
+        : 1) - 1
+      : 0;
+    const sort = args.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
+    const query = {};
+
+    if (args.sort.value === 'daily') {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      query['created.at'] = {
+        $gte: startOfToday,
+      };
+    }
+
+    if (params.query.value) {
+      query.$or = [
+        {
+          title: RegExp(params.query.value, 'i'),
+        },
+      ];
+    }
+
+    if (params.source && params.source.value) {
+      query.source = params.source.value;
+    }
+
+    posts = await Post.list({
       limit,
       page,
       sort,
       query,
     });
-  } catch (err) {
-    return next(err);
+  } catch (error) {
+    return next(error);
   }
 
-  let posts = req.posts;
-  if (req.user) {
-    posts = await Promise.all(req.posts.map(async (post) => {
-      // get actions
-      const options = {
-        query: {
-          isDeleted: false,
-          entity: post._id,
-          entityType: 'Post',
-          type: {
-            $in: ['view', 'share', 'save'],
-          },
-          user: req.user._id,
-        },
-      };
-      const actions = await Action.list(options);
-      post = post.toJSON();
-      actions.forEach((action) => {
-        if (action.type === 'view') {
-          post.isViewed = true;
-        } else if (action.type === 'share') {
-          post.isShared = true;
-        } else {
-          post.isSaved = true;
-        }
-      });
+  // return if not logged in yet
+  if (!req.user) {
+    return res.json(posts.map(post => post.securedInfo()));
+  }
 
-      return post;
-    }));
+  // add user data to each post
+  try {
+    posts = await Promise.all(posts.map(post => addUserData(req.user, post.securedInfo())));
+  } catch (error) {
+    return next(error);
   }
 
   return res.json(posts);
 };
 
-export const removeActivity = async (req, res, next) => {
-  const args = req.swagger.params;
+const getPost = async (req, res, next) => {
+  const params = req.swagger.params;
+
+  if (!params.id) {
+    return next(new APIError('Invalid id', BAD_REQUEST));
+  }
+
+  try {
+    const post = await Post.get(params.id.value);
+
+    if (!post) {
+      return next(new APIError('Post not found', NOT_FOUND));
+    }
+
+    req.post = post;
+  } catch (err) {
+    return next(err);
+  }
+
+  return next();
+};
+
+const showPost = async (req, res, next) => {
+  // return if not logged in yet
+  if (!req.user) {
+    return res.json(req.post.securedInfo());
+  }
+
+  // add user data
+  try {
+    req.post = await addUserData(req.user, req.post.securedInfo());
+  } catch (error) {
+    return next(error);
+  }
+
+  return res.json(req.post);
+};
+
+const createActivity = async (req, res, next) => {
+  const params = req.swagger.params;
+
+  // if user logged in
+  if (req.user) {
+    // create action for user
+    try {
+      const action = new Action({
+        type: params.action.value,
+        user: req.user ? req.user._id : null,
+        entity: req.post._id,
+        entityType: 'Post',
+      });
+
+      await action.createByUser(req.user);
+    } catch (error) {
+      return next(error);
+    }
+  } else if (params.action.value === 'save') {
+    // validate action requires logged in
+    return next(new APIError('Forbidden', FORBIDDEN));
+  }
+
+  // update meta data
+  try {
+    const numViewed = params.action.value === 'view' ? req.post.meta.numViewed + 1 : req.post.meta.numViewed;
+    const numShared = params.action.value === 'share' ? req.post.meta.numShared + 1 : req.post.meta.numShared;
+    const numSaved = params.action.value === 'save' ? req.post.meta.numSaved + 1 : req.post.meta.numSaved;
+
+    await req.post.extend({
+      meta: {
+        numViewed,
+        numShared,
+        numSaved,
+      },
+    }).updateByUser(req.user);
+  } catch (err) {
+    return next(err);
+  }
+
+  return next();
+};
+
+const removeActivity = async (req, res, next) => {
+  const params = req.swagger.params;
+
+  // validate action
+  if (params.action.value === 'view' || params.action.value === 'share') {
+    return next(new APIError('Forbidden', FORBIDDEN));
+  }
 
   // update action
   try {
-    const options = {
+    const action = await Action.get({
       query: {
         isDeleted: false,
         entity: req.post._id,
         entityType: 'Post',
-        type: {
-          $in: ['view', 'share', 'save'],
-        },
+        type: params.action.value,
         user: req.user._id,
       },
-    };
-    req.action = await Action.get(options);
+    });
 
-    if (req.action) {
-      req.action.extend({
+    if (action) {
+      await action.extend({
         isDeleted: true,
       }).updateByUser(req.user);
     }
@@ -196,17 +209,30 @@ export const removeActivity = async (req, res, next) => {
   }
 
   // update post
-  if (args.action.value === 'save') {
-    req.post.meta.numSaved -= 1;
-  }
-
   try {
-    req.post.extend({
-      meta: req.post.meta,
+    const numViewed = req.post.meta.numViewed;
+    const numShared = req.post.meta.numShared;
+    const numSaved = params.action.value === 'save' ? req.post.meta.numSaved - 1 : req.post.meta.numSaved;
+
+    await req.post.extend({
+      meta: {
+        numViewed,
+        numShared,
+        numSaved,
+      },
     }).updateByUser(req.user);
   } catch (err) {
     return next(err);
   }
 
-  return res.json(req.post.securedInfo());
+  return next();
+};
+
+export {
+  addUserData,
+  getPost,
+  showPost,
+  createActivity,
+  getPosts,
+  removeActivity,
 };
