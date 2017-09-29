@@ -71,21 +71,17 @@ export const doPost = async (req, res, next) => {
     next(err);
   }
 
-  try {
-    if (args.action.value === 'view') {
-      req.post.meta.numViewed += 1;
-    } else if (args.action.value === 'save') {
-      req.post.meta.numSaved += 1;
-    } else if (args.action.value === 'share') {
-      req.post.meta.numShared += 1;
-    }
-
-    await req.post.extend({
-      meta: req.post.meta,
-    }).updateByUser(req.user);
-  } catch (err) {
-    return next(err);
+  if (args.action.value === 'view') {
+    req.post.meta.numViewed += 1;
+  } else if (args.action.value === 'save') {
+    req.post.meta.numSaved += 1;
+  } else if (args.action.value === 'share') {
+    req.post.meta.numShared += 1;
   }
+
+  req.post.extend({
+    meta: req.post.meta,
+  }).updateByUser(req.user);
 
   return res.json(req.post.securedInfo());
 };
