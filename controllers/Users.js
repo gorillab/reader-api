@@ -1,34 +1,39 @@
-import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
+import MiddelwaresWrapper from '../helpers/middlewaresWrapper';
 import * as Users from './UsersService';
-import isLoggedin from '../middlewares/auth';
-import postMockData from '../mock-data/post.json';
-import sourceMockData from '../mock-data/source.json';
-import userMockData from '../mock-data/user.json';
+import isLoggedIn from '../middlewares/auth';
 
-export const getSavedPosts = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(postMockData.list);
-} : MiddelwaresWrapper([
-  isLoggedin,
+import mock from '../middlewares/mock';
+import mockPost from '../data/mock/post.json';
+import mockSource from '../data/mock/source.json';
+import mockUser from '../data/mock/user.json';
+
+const getUser = MiddelwaresWrapper([
+  mock(mockUser.item),
+  isLoggedIn,
+  Users.getUser,
+]);
+
+const getForYouPosts = MiddelwaresWrapper([
+  mock(mockPost.list),
+  isLoggedIn,
+  Users.getForYouPosts,
+]);
+
+const getSavedPosts = MiddelwaresWrapper([
+  mock(mockPost.list),
+  isLoggedIn,
   Users.getSavedPosts,
 ]);
 
-export const getSubscriptions = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(sourceMockData.list);
-} : MiddelwaresWrapper([
-  isLoggedin,
+const getSubscriptions = MiddelwaresWrapper([
+  mock(mockSource.list),
+  isLoggedIn,
   Users.getSubscriptions,
 ]);
 
-export const forYou = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(postMockData.list);
-} : MiddelwaresWrapper([
-  isLoggedin,
-  Users.forYou,
-]);
-
-export const getUser = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(userMockData.item);
-} : MiddelwaresWrapper([
-  isLoggedin,
-  Users.getUser,
-]);
+export {
+  getUser,
+  getForYouPosts,
+  getSavedPosts,
+  getSubscriptions,
+};

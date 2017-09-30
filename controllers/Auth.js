@@ -1,20 +1,30 @@
-import MiddelwaresWrapper from '../helpers/RouteMiddlewaresWrapper';
+import middelwaresWrapper from '../helpers/middlewaresWrapper';
 import * as Auth from './AuthService';
-import userMockData from '../mock-data/user.json';
 
-export const loginByFacebook = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json({
+import mock from '../middlewares/mock';
+import mockUser from '../data/mock/user.json';
+
+const loginByFacebook = middelwaresWrapper([
+  mock({
     message: 'Redirect to facebook authenticate page',
-  });
-} : MiddelwaresWrapper(Auth.loginByFacebook);
+  }),
+  Auth.loginByFacebook,
+]);
 
-export const loginByFacebookCallback = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json(userMockData.item);
-} : MiddelwaresWrapper(Auth.loginByFacebookCallback);
+const loginByFacebookCallback = middelwaresWrapper([
+  mock(mockUser.item),
+  Auth.loginByFacebookCallback,
+]);
 
-
-export const logout = process.env.NODE_ENV === 'mock' ? (req, res) => {
-  res.json({
+const logout = middelwaresWrapper([
+  mock({
     message: 'Done',
-  });
-} : MiddelwaresWrapper(Auth.logout);
+  }),
+  Auth.logout,
+]);
+
+export {
+  loginByFacebook,
+  loginByFacebookCallback,
+  logout,
+};
