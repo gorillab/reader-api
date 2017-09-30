@@ -50,10 +50,10 @@ const getPosts = async (req, res, next) => {
         ? params.page.value
         : 1) - 1
       : 0;
-    const sort = args.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
+    const sort = params.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
     const query = {};
 
-    if (args.sort.value === 'daily') {
+    if (params.sort.value === 'daily') {
       const now = new Date();
       const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       query['created.at'] = {
