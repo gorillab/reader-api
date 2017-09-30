@@ -18,7 +18,6 @@ const addUserData = (user, source) => {
 const getSources = async (req, res, next) => {
   const params = req.swagger.params;
   let sources = [];
-
   try {
     const limit = params.limit.value || 25;
     const page = params.page.value
@@ -26,7 +25,7 @@ const getSources = async (req, res, next) => {
         ? params.page.value
         : 1) - 1
       : 0;
-    const sort = params.sort.value || 'title';
+    const sort = params.sort.value || '-created.at';
     const query = {};
 
     if (params.query.value) {
