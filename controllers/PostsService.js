@@ -88,8 +88,7 @@ const getPosts = async (req, res, next) => {
     return res.json(posts.map(post => post.securedInfo()));
   }
 
-  // add user data to 
-  each post
+  // add user data to each post
   try {
     posts = await Promise.all(posts.map(post => addUserData(req.user, post.securedInfo())));
   } catch (error) {
