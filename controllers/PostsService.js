@@ -8,7 +8,7 @@ const addUserData = async (user, post) => {
   const actions = await Action.list({
     query: {
       isDeleted: false,
-      entity: post._id,
+      entity: post.id,
       entityType: 'Post',
       type: {
         $in: ['view', 'share', 'save'],
