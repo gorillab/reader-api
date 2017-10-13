@@ -5,7 +5,7 @@ import Source from '../models/source';
 import Action from '../models/action';
 
 const addUserData = (user, source) => {
-  if (user.sources.some(s => s.toString() === source._id.toString())) {
+  if (user.sources.some(s => s.toString() === source.id.toString())) {
     return {
       ...source,
       isSubscribed: true,
@@ -50,7 +50,7 @@ const getSources = async (req, res, next) => {
     return res.json(sources.map(source => source.securedInfo()));
   }
 
-  return res.json(sources.map(source => addUserData(source.securedInfo())));
+  return res.json(sources.map(source => addUserData(req.user, source.securedInfo())));
 };
 
 const getSource = async (req, res, next) => {
@@ -80,7 +80,7 @@ const showSource = (req, res) => {
     res.json(req.source.securedInfo());
   }
 
-  return res.json(addUserData(req.source.securedInfo()));
+  return res.json(addUserData(req.user, req.source.securedInfo()));
 };
 
 const subscribe = async (req, res, next) => {
