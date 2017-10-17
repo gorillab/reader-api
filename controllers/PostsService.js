@@ -110,12 +110,12 @@ const getPosts = async (req, res, next) => {
       query.source = params.source.value;
     }
 
-    posts = params.sort.value ? await Post.list({
+    posts = !params.sort.value || params.sort.value === 'new' ? await getDefaultPosts({
       limit,
       page,
       sort,
       query,
-    }) : await getDefaultPosts({
+    }) : await Post.list({
       limit,
       page,
       sort,
