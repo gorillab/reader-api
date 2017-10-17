@@ -2,6 +2,7 @@ import { BAD_REQUEST, NOT_FOUND, FORBIDDEN } from 'http-status';
 
 import Post from '../models/post';
 import Action from '../models/action';
+import Source from '../models/source';
 import APIError from '../helpers/APIError';
 
 const addUserData = async (user, post) => {
@@ -38,6 +39,42 @@ const addUserData = async (user, post) => {
   }, post);
 };
 
+const getDefaultPosts = async ({ limit, page, query, sort }) => {
+  let postLimit = Math.ceil(limit / 2);
+  // get sources
+  const sources = await Source.list({
+    query: {
+      isDeleted: false,
+    },
+    select: '_id',
+  });
+
+  const promises = sources.map(async ({ _id }) => {
+    query.source = _id;
+
+    const post = await Post.list({
+      page,
+      sort,
+      query,
+      limit: postLimit,
+    });
+    postLimit = limit - postLimit;
+    return post;
+  });
+
+  const result = await Promise.all(promises);
+  const posts = [];
+
+  while (result[0].length > 0 || result[1].length > 0) {
+    if (result[0].length > 0) posts.push(result[0].pop());
+    if (result[1].length > 0) posts.push(result[1].pop());
+  }
+
+  posts.length = limit;
+  return posts;
+};
+
+
 const getPosts = async (req, res, next) => {
   const params = req.swagger.params;
   let posts = [];
@@ -73,7 +110,12 @@ const getPosts = async (req, res, next) => {
       query.source = params.source.value;
     }
 
-    posts = await Post.list({
+    posts = !params.sort.value || params.sort.value === 'new' ? await getDefaultPosts({
+      limit,
+      page,
+      sort,
+      query,
+    }) : await Post.list({
       limit,
       page,
       sort,
@@ -82,7 +124,6 @@ const getPosts = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-
   // return if not logged in yet
   if (!req.user) {
     return res.json(posts.map(post => post.securedInfo()));
@@ -94,9 +135,9 @@ const getPosts = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-
   return res.json(posts);
 };
+
 
 const getPost = async (req, res, next) => {
   const params = req.swagger.params;
