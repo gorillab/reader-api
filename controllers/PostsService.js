@@ -69,8 +69,7 @@ const getDefaultPosts = async ({ limit, page, query, sort }) => {
     if (result[0].length > 0) posts.push(result[0].pop());
     if (result[1].length > 0) posts.push(result[1].pop());
   }
-
-  posts.length = limit;
+  posts.reverse().length = limit;
   return posts;
 };
 
@@ -110,7 +109,7 @@ const getPosts = async (req, res, next) => {
       query.source = params.source.value;
     }
 
-    posts = !params.sort.value || params.sort.value === 'new' ? await getDefaultPosts({
+    posts = (!params.sort.value || params.sort.value === 'new') && !query.source ? await getDefaultPosts({
       limit,
       page,
       sort,
