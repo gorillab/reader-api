@@ -40,7 +40,6 @@ const addUserData = async (user, post) => {
 };
 
 const getDefaultPosts = async ({ limit, page, query, sort }) => {
-  let postLimit = Math.ceil(limit / 2);
   // get sources
   const sources = await Source.list({
     query: {
@@ -49,27 +48,25 @@ const getDefaultPosts = async ({ limit, page, query, sort }) => {
     select: '_id',
   });
 
-  const promises = sources.map(async ({ _id }) => {
-    query.source = _id;
+  const postsArray = [];
 
-    const post = await Post.list({
+  for (const [index, { _id }] of sources.entries()) {
+    postsArray.push(await Post.list({
       page,
       sort,
-      query,
-      limit: postLimit,
-    });
-    postLimit = limit - postLimit;
-    return post;
-  });
-
-  const result = await Promise.all(promises);
-  const posts = [];
-
-  while (result[0].length > 0 || result[1].length > 0) {
-    if (result[0].length > 0) posts.push(result[0].pop());
-    if (result[1].length > 0) posts.push(result[1].pop());
+      query: query ? { ...query, source: _id } : undefined,
+      limit: index === sources.length - 1
+      ? limit - (index * Math.floor(limit / sources.length))
+      : Math.floor((limit / sources.length)),
+    }));
   }
-  posts.reverse().length = limit;
+
+  const posts = [];
+  while ([].concat(...postsArray).length > 0 && posts.length < limit) {
+    sources.forEach((source, index) => {
+      if (postsArray[index].length > 0) posts.push(postsArray[index].pop());
+    });
+  }
   return posts;
 };
 
