@@ -48,26 +48,29 @@ const getDefaultPosts = async ({ limit, page, query, sort }) => {
     select: '_id',
   });
 
-  const postsArray = [];
+  const promises = sources.map(async ({ _id }, index) => {
+    query.source = _id;
 
-  for (const [index, { _id }] of sources.entries()) {
-    postsArray.push(await Post.list({
+    const post = await Post.list({
       page,
       sort,
       query: query ? { ...query, source: _id } : undefined,
       limit: index === sources.length - 1
       ? limit - (index * Math.floor(limit / sources.length))
       : Math.floor((limit / sources.length)),
-    }));
-  }
+    });
+    return post;
+  });
 
+  const result = await Promise.all(promises);
   const posts = [];
-  while ([].concat(...postsArray).length > 0 && posts.length < limit) {
-    sources.forEach((source, index) => {
-      if (postsArray[index].length > 0) posts.push(postsArray[index].pop());
+
+  while ([].concat(...result).length > 0 && posts.length < limit) {
+    result.forEach((sourcePosts) => {
+      if (sourcePosts.length > 0) posts.push(sourcePosts.pop());
     });
   }
-  return posts;
+  return posts.reverse();
 };
 
 
