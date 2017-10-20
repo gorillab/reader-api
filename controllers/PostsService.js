@@ -39,6 +39,17 @@ const addUserData = async (user, post) => {
   }, post);
 };
 
+const mergePosts = (threeDPostArray) => {
+  const posts = [];
+  while ([].concat(...threeDPostArray).length) {
+    threeDPostArray.forEach((sourcePosts) => {
+      if (sourcePosts.length > 0) posts.push(sourcePosts.pop());
+    });
+  }
+
+  return posts.reverse();
+};
+
 const getDefaultPosts = async ({ limit, page, query, sort }) => {
   // get sources
   const sources = await Source.list({
@@ -61,16 +72,9 @@ const getDefaultPosts = async ({ limit, page, query, sort }) => {
     });
     return post;
   });
-
   const result = await Promise.all(promises);
-  const posts = [];
 
-  while ([].concat(...result).length > 0 && posts.length < limit) {
-    result.forEach((sourcePosts) => {
-      if (sourcePosts.length > 0) posts.push(sourcePosts.pop());
-    });
-  }
-  return posts.reverse();
+  return mergePosts(result);
 };
 
 
