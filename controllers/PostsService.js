@@ -41,13 +41,14 @@ const addUserData = async (user, post) => {
 
 const mergePosts = (threeDPostArray) => {
   const posts = [];
-  while ([].concat(...threeDPostArray).length) {
+  const max = [].concat(...threeDPostArray).length;
+  while (posts.length < max) {
     threeDPostArray.forEach((sourcePosts) => {
-      if (sourcePosts.length > 0) posts.push(sourcePosts.pop());
+      if (sourcePosts.length > 0) posts.push(sourcePosts.shift());
     });
   }
 
-  return posts.reverse();
+  return posts;
 };
 
 const getDefaultPosts = async ({ limit, page, query, sort }) => {
