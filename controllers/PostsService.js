@@ -2,6 +2,7 @@ import { BAD_REQUEST, NOT_FOUND, FORBIDDEN } from 'http-status';
 
 import Post from '../models/post';
 import Action from '../models/action';
+import Source from '../models/source';
 import APIError from '../helpers/APIError';
 
 const addUserData = async (user, post) => {
@@ -38,6 +39,46 @@ const addUserData = async (user, post) => {
   }, post);
 };
 
+const mergePosts = (threeDPostArray) => {
+  const posts = [];
+  const max = [].concat(...threeDPostArray).length;
+  while (posts.length < max) {
+    threeDPostArray.forEach((sourcePosts) => {
+      if (sourcePosts.length > 0) posts.push(sourcePosts.shift());
+    });
+  }
+
+  return posts;
+};
+
+const getDefaultPosts = async ({ limit, page, query, sort }) => {
+  // get sources
+  const sources = await Source.list({
+    query: {
+      isDeleted: false,
+    },
+    select: '_id',
+  });
+
+  const promises = sources.map(async ({ _id }, index) => {
+    query.source = _id;
+
+    const post = await Post.list({
+      page,
+      sort,
+      query: query ? { ...query, source: _id } : undefined,
+      limit: index === sources.length - 1
+      ? limit - (index * Math.floor(limit / sources.length))
+      : Math.floor((limit / sources.length)),
+    });
+    return post;
+  });
+  const result = await Promise.all(promises);
+
+  return mergePosts(result);
+};
+
+
 const getPosts = async (req, res, next) => {
   const params = req.swagger.params;
   let posts = [];
@@ -73,7 +114,12 @@ const getPosts = async (req, res, next) => {
       query.source = params.source.value;
     }
 
-    posts = await Post.list({
+    posts = (!params.sort.value || params.sort.value === 'new') && !query.source ? await getDefaultPosts({
+      limit,
+      page,
+      sort,
+      query,
+    }) : await Post.list({
       limit,
       page,
       sort,
@@ -82,7 +128,6 @@ const getPosts = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-
   // return if not logged in yet
   if (!req.user) {
     return res.json(posts.map(post => post.securedInfo()));
@@ -94,9 +139,9 @@ const getPosts = async (req, res, next) => {
   } catch (error) {
     return next(error);
   }
-
   return res.json(posts);
 };
+
 
 const getPost = async (req, res, next) => {
   const params = req.swagger.params;
