@@ -1,7 +1,7 @@
 import Post from '../models/post';
 import Source from '../models/source';
 import Action from '../models/action';
-import { addUserData } from './PostsService';
+import { addUserData, getDefaultPosts } from './PostsService';
 
 const getUser = (req, res) => {
   res.json(req.user.securedInfo());
@@ -19,13 +19,26 @@ const getForYouPosts = async (req, res, next) => {
         ? params.page.value
         : 1) - 1
       : 0;
-    const sort = params.sort.value || 'title';
+    const sort = params.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
     const query = {
       isDeleted: false,
       source: {
         $in: req.user.sources,
       },
     };
+
+    if (params.sort.value === 'daily') {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      query['created.at'] = {
+        $gte: startOfToday,
+      };
+    }
+
+    if (params.source && params.source.value) {
+      if (!req.user.sources.includes(params.source.value)) return res.json([]);
+      query.source = params.source.value;
+    }
 
     if (params.query.value) {
       query.$or = [
@@ -34,8 +47,12 @@ const getForYouPosts = async (req, res, next) => {
         },
       ];
     }
-
-    posts = await Post.list({
+    posts = (!params.sort.value || params.sort.value === 'new') && query.source && query.source.$in ? await getDefaultPosts({
+      limit,
+      page,
+      sort,
+      query,
+    }, req.user.sources) : await Post.list({
       limit,
       page,
       sort,
