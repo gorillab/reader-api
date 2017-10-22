@@ -1,10 +1,40 @@
 import Post from '../models/post';
 import Source from '../models/source';
 import Action from '../models/action';
-import { addUserData, getDefaultPosts } from './PostsService';
+import { addUserData, mergePosts } from './PostsService';
 
 const getUser = (req, res) => {
   res.json(req.user.securedInfo());
+};
+
+const getDefaultPosts = async ({ limit, page, query, sort }, sourceIds = []) => {
+  // get sources
+  const sources = await Source.list({
+    query: {
+      isDeleted: false,
+      _id: {
+        $in: sourceIds,
+      },
+    },
+    select: '_id',
+  });
+
+  const promises = sources.map(async ({ _id }, index) => {
+    query.source = _id;
+
+    const post = await Post.list({
+      page,
+      sort,
+      query: query ? { ...query, source: _id } : undefined,
+      limit: index === sources.length - 1
+      ? limit - (index * Math.floor(limit / sources.length))
+      : Math.floor((limit / sources.length)),
+    });
+    return post;
+  });
+  const result = await Promise.all(promises);
+
+  return mergePosts(result);
 };
 
 const getForYouPosts = async (req, res, next) => {

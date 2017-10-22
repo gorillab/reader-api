@@ -51,14 +51,11 @@ const mergePosts = (threeDPostArray) => {
   return posts;
 };
 
-const getDefaultPosts = async ({ limit, page, query, sort }, sourceIds) => {
+const getDefaultPosts = async ({ limit, page, query, sort }) => {
   // get sources
   const sources = await Source.list({
     query: {
       isDeleted: false,
-      _id: Array.isArray(sourceIds) ? {
-        $in: sourceIds,
-      } : { $exists: true },
     },
     select: '_id',
   });
@@ -278,7 +275,6 @@ const removeActivity = async (req, res, next) => {
 export {
   addUserData,
   mergePosts,
-  getDefaultPosts,
   getPost,
   showPost,
   createActivity,
