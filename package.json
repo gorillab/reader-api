@@ -1,6 +1,6 @@
 {
   "name": "reader-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "This api service served to end users or third-party apps/services",
   "author": {
     "name": "Gorillab",

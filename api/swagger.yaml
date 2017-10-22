@@ -2,7 +2,7 @@
 swagger: "2.0"
 info:
   description: "This api service served to end users or third-party apps/services"
-  version: "1.0.0"
+  version: "1.0.1"
   title: "Reader API"
   contact:
     name: "Gorillab"
