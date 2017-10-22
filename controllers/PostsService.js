@@ -274,6 +274,7 @@ const removeActivity = async (req, res, next) => {
 
 export {
   addUserData,
+  mergePosts,
   getPost,
   showPost,
   createActivity,

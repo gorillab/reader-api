@@ -1,10 +1,40 @@
 import Post from '../models/post';
 import Source from '../models/source';
 import Action from '../models/action';
-import { addUserData } from './PostsService';
+import { addUserData, mergePosts } from './PostsService';
 
 const getUser = (req, res) => {
   res.json(req.user.securedInfo());
+};
+
+const getDefaultPosts = async ({ limit, page, query, sort }, sourceIds = []) => {
+  // get sources
+  const sources = await Source.list({
+    query: {
+      isDeleted: false,
+      _id: {
+        $in: sourceIds,
+      },
+    },
+    select: '_id',
+  });
+
+  const promises = sources.map(async ({ _id }, index) => {
+    query.source = _id;
+
+    const post = await Post.list({
+      page,
+      sort,
+      query: query ? { ...query, source: _id } : undefined,
+      limit: index === sources.length - 1
+      ? limit - (index * Math.floor(limit / sources.length))
+      : Math.floor((limit / sources.length)),
+    });
+    return post;
+  });
+  const result = await Promise.all(promises);
+
+  return mergePosts(result);
 };
 
 const getForYouPosts = async (req, res, next) => {
@@ -19,13 +49,26 @@ const getForYouPosts = async (req, res, next) => {
         ? params.page.value
         : 1) - 1
       : 0;
-    const sort = params.sort.value || 'title';
+    const sort = params.sort.value === 'best' ? '-meta.numViewed' : '-created.at';
     const query = {
       isDeleted: false,
       source: {
         $in: req.user.sources,
       },
     };
+
+    if (params.sort.value === 'daily') {
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      query['created.at'] = {
+        $gte: startOfToday,
+      };
+    }
+
+    if (params.source && params.source.value) {
+      if (!req.user.sources.includes(params.source.value)) return res.json([]);
+      query.source = params.source.value;
+    }
 
     if (params.query.value) {
       query.$or = [
@@ -34,8 +77,12 @@ const getForYouPosts = async (req, res, next) => {
         },
       ];
     }
-
-    posts = await Post.list({
+    posts = (!params.sort.value || params.sort.value === 'new') && query.source && query.source.$in ? await getDefaultPosts({
+      limit,
+      page,
+      sort,
+      query,
+    }, req.user.sources) : await Post.list({
       limit,
       page,
       sort,
