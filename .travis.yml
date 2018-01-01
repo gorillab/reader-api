@@ -1,39 +1,36 @@
+sudo: required
+
 language: node_js
 
 node_js:
-  - 6
-  - 7
-  - 8
+- 9
 
-services:
-  - mongodb
+env:
+- DOCKER_REPO=gorillab/reader-api
 
-install:
-  - yarn
+jobs:
+  include:
+  - stage: test
+    install:
+    - yarn
+    script:
+    - yarn test
+  - stage: build
+    services:
+    - docker
+    install:
+    - yarn
+    script:
+    - yarn build
+    - docker build -t "$DOCKER_REPO" .
+    - if [ ! -z "$TRAVIS_TAG" ]; then docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+      for TAG in {"$TRAVIS_TAG",latest}; do docker tag "$DOCKER_REPO" "$DOCKER_REPO":"$TAG";
+      docker push "$DOCKER_REPO":"$TAG"; done fi
 
 cache:
   yarn: true
   directories:
   - node_modules
-
-script:
-  - yarn build
-
-deploy:
-  - provider: heroku
-    api_key: $HEROKU_API_KEY
-    skip_cleanup: true
-    app: glab-staging-reader-api
-    on:
-      branch: master
-      node: '8'
-  - provider: heroku
-    api_key: $HEROKU_API_KEY
-    skip_cleanup: true
-    app: glab-reader-api
-    on:
-      tags: true
-      node: '8'
 
 notifications:
   email: false
