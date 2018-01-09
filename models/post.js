@@ -52,7 +52,7 @@ const postSchema = new Mongoose.Schema({
 
 postSchema.method({
   securedInfo() {
-    const { _id, title, content, image, url, source, meta } = this;
+    const { _id, title, content, image, url, source, meta, timestamp } = this;
 
     return {
       id: _id,
@@ -62,6 +62,7 @@ postSchema.method({
       url,
       source,
       meta,
+      timestamp,
     };
   },
 });
@@ -79,7 +80,7 @@ postSchema.statics = {
   list({ query, page, sort, limit, select }) {
     return this.find(query || {})
     .sort(sort || '-created.at')
-    .select(select || 'id title content image url source meta')
+    .select(select || 'id title content image url source meta timestamp')
     .skip((limit || 0) * (page || 0))
     .limit(limit || 0)
     .populate('source', 'title')
