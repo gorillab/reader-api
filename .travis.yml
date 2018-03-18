@@ -1,38 +1,26 @@
 sudo: required
-
 language: node_js
-
 node_js:
-- 9
-
+    - 9
 env:
-- DOCKER_REPO=gorillab/reader-api
-
+    - DOCKER_REPO=gorillab/reader-api
 jobs:
-  include:
-  - stage: test
-    install:
-    - yarn
-    script:
-    - yarn test
-  - stage: build
-    services:
-    - docker
-    install:
-    - yarn
-    script:
-    - yarn build
-    - docker build -t "$DOCKER_REPO" .
-    - if [ ! -z "$TRAVIS_TAG" ]; then docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-      for TAG in {"$TRAVIS_TAG",latest}; do docker tag "$DOCKER_REPO" "$DOCKER_REPO":"$TAG";
-      docker push "$DOCKER_REPO":"$TAG"; done fi
-
+    include:
+        -
+            stage: test
+            install: [yarn]
+            script: ['yarn test']
+        -
+            stage: build
+            services: [docker]
+            install: [yarn]
+            script: ['yarn build', 'docker build -t "$DOCKER_REPO" .', "if [ ! -z \"$TRAVIS_TAG\" ]; then docker login -u \"$DOCKER_USERNAME\" -p \"$DOCKER_PASSWORD\";\nfor TAG in {\"$TRAVIS_TAG\",latest}; do docker tag \"$DOCKER_REPO\" \"$DOCKER_REPO\":\"$TAG\";\ndocker push \"$DOCKER_REPO\":\"$TAG\"; done fi"]
 cache:
-  yarn: true
-  directories:
-  - node_modules
-
+    yarn: true
+    directories:
+        - node_modules
 notifications:
-  email: false
-  slack:
-    secure: zXunWOJpUCJ1muWvPyswNqjJCqcOgGGRcwfXtKi7HHwkNPv60WCP4+7w4RTxXBIvoId8+ZBz9fVCObj8NCVEpwbpVIBSgFZ/cR+6zf56aMZf25rORMfK8skrcE0TSxY+QwHpHFMcfM5J0pNZFlYKADezZaQ+VcTVFLz8eacojQA7EQB6/fUFhbCrIY5QzKvc3Eoo0mqdJVJicc3GU7/tTwnAb9xuDDuRY9M9yhBCTlyfLInZDW1g3RT/tixD4cQM5sEoD+Dzsm7ZyU/9mhnwZqimcYv2Y1X7uInsdpE1R6CF2laIN4BIqMs0Xn/FxWsJnmaumLrPd41Jzx3M0y3dpCDvJIHcakdn7QKIVaYt/1sI5w9Z9w3xxJuhkVHy8AgjTj1W1oGTD+F4owwhSm4CwghqZ0E/+pCmW9afhwilOBjFUUTZxW+k9t3EstpSqxaH0LOluN0S3qSODNclwPPTksMvZLMddr5HPWSy7qlzsy0jib5WGp/lvvIEZ1U2Zl8U90HGyrF0e/iEkc81w+GhZXU9xiWsuBi8YwTNFt7RiHrxs6lkOqJ8m1h+RekTZvx/HnUj8Ta/wHE/xALQUPxChAMF73UFp6HM9udxvbP1B+Yd+onjE0V0jevcCz0zDfFeC1ZSUCYDH7/BrxBO2/UgPF1vq3FKNEavQksLvobkzTw=
+    email: false
+    slack:
+        secure: zXunWOJpUCJ1muWvPyswNqjJCqcOgGGRcwfXtKi7HHwkNPv60WCP4+7w4RTxXBIvoId8+ZBz9fVCObj8NCVEpwbpVIBSgFZ/cR+6zf56aMZf25rORMfK8skrcE0TSxY+QwHpHFMcfM5J0pNZFlYKADezZaQ+VcTVFLz8eacojQA7EQB6/fUFhbCrIY5QzKvc3Eoo0mqdJVJicc3GU7/tTwnAb9xuDDuRY9M9yhBCTlyfLInZDW1g3RT/tixD4cQM5sEoD+Dzsm7ZyU/9mhnwZqimcYv2Y1X7uInsdpE1R6CF2laIN4BIqMs0Xn/FxWsJnmaumLrPd41Jzx3M0y3dpCDvJIHcakdn7QKIVaYt/1sI5w9Z9w3xxJuhkVHy8AgjTj1W1oGTD+F4owwhSm4CwghqZ0E/+pCmW9afhwilOBjFUUTZxW+k9t3EstpSqxaH0LOluN0S3qSODNclwPPTksMvZLMddr5HPWSy7qlzsy0jib5WGp/lvvIEZ1U2Zl8U90HGyrF0e/iEkc81w+GhZXU9xiWsuBi8YwTNFt7RiHrxs6lkOqJ8m1h+RekTZvx/HnUj8Ta/wHE/xALQUPxChAMF73UFp6HM9udxvbP1B+Yd+onjE0V0jevcCz0zDfFeC1ZSUCYDH7/BrxBO2/UgPF1vq3FKNEavQksLvobkzTw=
+        on_pull_requests: false
